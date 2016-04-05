@@ -5,29 +5,34 @@
 #ifndef R2D2_PATHFINDING_ASTAR_HPP
 #define R2D2_PATHFINDING_ASTAR_HPP
 
-#include<vector>
-#include<algorithm>
-#include<unordered_set>
+#include <vector>
+#include <algorithm>
+#include <unordered_set>
+#include <iostream>
+#include <memory>
+#include "PathFinder.hpp"
 
-#define MAX_SEARCH_NODES 10000 // value has to be tested
+#define MAX_SEARCH_NODES 10000000 // value has to be tested
 
 template<typename T>
 class Node {
 public:
-	Node(float g, float h, T *parent):
+	Node(float g, float h, std::weak_ptr<T> parent) :
 			g{ g },
 			h{ h },
 			f{ g + h },
 			parent{ parent } {
 	}
 
-	float f, g, h;
-	T* parent;
+	float g, h, f;
+	std::weak_ptr<T> parent;
 
-	virtual std::vector<T> getAvailableNodes() = 0;
 	virtual bool operator==(const T &n) const = 0;
-	bool operator<(Node & compare) {
-		return f < compare.f;
+
+	virtual std::vector<T> getAvailableNodes(std::shared_ptr<T> self) = 0;
+
+	bool operator>(const T &compare) const {
+		return f > compare.f;
 	}
 };
 
@@ -36,30 +41,35 @@ class AStarSearch {
 public:
 	// template functions have to be defined in the header itself
 	AStarSearch(T &end):
-			open{ end },
-			openSet{ &end },
-			closed{} {
+			closed{},
+			open{} {
+		std::shared_ptr<T> endPtr{std::make_shared<T>(end)};
+		closed.emplace(endPtr);
+		open.push_back(endPtr);
 	}
 
-	T* search(T &start) {
+	std::shared_ptr<T> search(T &start) {
 		int giveUpCount = MAX_SEARCH_NODES;
 
 		while (!open.empty() && --giveUpCount >= 0) {
-			T &curOpen = open[0];
-			std::pop_heap(open.begin(), open.end());
+			std::shared_ptr<T> curOpen{open[0]};
+//			std::cout << *curOpen << std::endl;
+			std::pop_heap(open.begin(), open.end(),
+			              [](std::shared_ptr<T> &n1, std::shared_ptr<T> &n2) { return *n1 > *n2; });
 			open.pop_back();
-			openSet.erase(&curOpen);
-			closed.emplace(curOpen);
 
-			for (T &child : curOpen.getAvailableNodes()) {
-				if (child == start) {
-					return &child;
+			for (T &c : curOpen->getAvailableNodes(curOpen)) {
+				std::shared_ptr<T> child{std::make_shared<T>(c)};
+
+				auto result = closed.emplace(child);
+				if (result.second) {
+//					std::cout << **result.first << std::endl;
+					open.emplace_back(*result.first);
+					std::push_heap(open.begin(), open.end(),
+					               [](std::shared_ptr<T> &n1, std::shared_ptr<T> &n2) { return *n1 > *n2; });
 				}
-
-				if (openSet.find(&child) == openSet.end()
-				    && closed.find(child) == closed.end()) {
-					open.emplace_back(child);
-					std::push_heap(open.begin(), open.end());
+				if (*child == start) {
+					return *closed.find(child);
 				}
 			}
 		}
@@ -67,9 +77,20 @@ public:
 	}
 
 private:
-	std::vector<T> open;
-	std::unordered_set<T*> openSet;
-	std::unordered_set<T> closed;
+	struct TPtrEqual : std::binary_function<std::shared_ptr<T>, std::shared_ptr<T>, bool> {
+		bool operator()(std::shared_ptr<T> n1, std::shared_ptr<T> n2) const {
+			return *n1 == *n2;
+		}
+	};
+
+	struct THasher {
+		std::size_t operator()(std::shared_ptr<T> n) const {
+			return std::hash<T>()(*n);
+		}
+	};
+
+	std::unordered_set<std::shared_ptr<T>, THasher, TPtrEqual> closed;
+	std::vector<std::shared_ptr<T>> open;
 };
 
 #endif //R2D2_PATHFINDING_ASTAR_HPP

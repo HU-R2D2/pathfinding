@@ -7,15 +7,22 @@
 
 
 #include <vector>
+#include <cmath>
 #include "Dummy.hpp"
 #include "Astar.hpp"
 
-//value will be replaced by a function in the interface later, but it has not yet been specified in the technote
-#define ROBOT_SIZE 1
-
 class Coordinate {
 public:
+	Coordinate(float x, float y) :
+			x{x},
+			y{y} {
+	}
+	
 	float x, y;
+
+	friend std::ostream &operator<<(std::ostream &lhs, const Coordinate &rhs) {
+		return lhs << "(" << rhs.x << ", " << rhs.y << ")";
+	}
 };
 
 //! interface for a pathfinder module
@@ -49,33 +56,50 @@ public:
 	class CoordNode : public Node<CoordNode> {
 	public:
 		CoordNode(PathFinder &pathFinder, Coordinate coord,
-		          Coordinate &startCoord, float g = std::numeric_limits<float>::infinity(), CoordNode *parent = nullptr);
+		          Coordinate &startCoord, float g = std::numeric_limits<float>::infinity(),
+		          std::weak_ptr<CoordNode> parent = {});
 
 		virtual bool operator==(const CoordNode &lhs) const override;
-		virtual std::vector<CoordNode> getAvailableNodes() override;
 
-		PathFinder *pathFinder; // variables need to be pointers to be able to use assignment
-		Coordinate coord, *startNodeCoord;
+		virtual std::vector<CoordNode> getAvailableNodes(std::shared_ptr<CoordNode> self) override;
+
+		PathFinder &pathFinder; // variables need to be pointers to be able to use assignment
+		Coordinate coord, &startNodeCoord;
+
+		friend std::ostream &operator<<(std::ostream &lhs, const CoordNode &rhs) {
+			return lhs << "(" << rhs.coord << ", " << rhs.g << ", " << rhs.h << ", " << rhs.f << ")";
+		}
 	};
 
 private:
 	Map &map;
 	Coordinate robotBox;
 
-	bool canVisit(Coordinate pos);
-	static bool overlaps(Coordinate c1, Coordinate c2);
-	static float getHeuristic(Coordinate dist); // will be replaced with an offset
+	bool canVisit(const Coordinate &pos);
 
-	std::vector<CoordNode> getPath(CoordNode &start);
+	bool overlaps(const Coordinate &c1, const Coordinate &c2);
+
+	static float getHeuristic(const Coordinate &dist); // will be replaced with an offset
+
+	std::vector<CoordNode> getPath(std::shared_ptr<CoordNode> start);
 };
 
 namespace std {
+
+	template<>
+	struct hash<Coordinate> {
+		std::size_t operator()(const Coordinate &coord) const {
+
+			return std::hash<float>()(coord.x)
+			       ^ (std::hash<float>()(coord.y) << (sizeof(float) / 2));
+		}
+	};
+
 	template<>
 	struct hash<PathFinder::CoordNode> {
 		std::size_t operator()(const PathFinder::CoordNode& node) const {
 
-			return std::hash<float>()(node.coord.x)
-			         ^ (std::hash<float>()(node.coord.y) << (sizeof(float) / 2));
+			return std::hash<Coordinate>()(node.coord);
 		}
 	};
 }
