@@ -17,7 +17,7 @@ public:
 	int sizeX = 100;
 	int sizeY = 100;
 
-	Map(int x, int y);
+	Map(int x, int y, bool obstacles = true);
 	void printMap();
 	bool hasObstacle(float x, float y, float sizeX, float sizeY);
 	bool hasPassable(float x, float y, float sizeX, float sizeY);
