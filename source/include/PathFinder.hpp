@@ -11,6 +11,10 @@
 #include "Dummy.hpp"
 #include "Astar.hpp"
 
+// defines the amount of nodes that will be visited per length of the robot
+// for instance, if the robot has a size of 1m, and this value is 2, a node will be opened every .5m
+#define SQUARES_PER_ROBOT 2
+
 class Coordinate {
 public:
 	Coordinate(float x, float y) :
