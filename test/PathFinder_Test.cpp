@@ -18,6 +18,39 @@ bool equal(const std::vector<Coordinate> &lhs, const std::vector<Coordinate> &rh
 	return true;
 }
 
+std::vector<std::vector<int>> makeMap(int pathSize, int x, int y){
+	std::vector<std::vector<int>> map;
+	for (int i = 0; i < x; i++) {
+		std::vector<int> current;
+		for (int j = 0; j < y; j++) {
+			if (i - pathSize <= j && i + pathSize > j){
+				current.push_back(0);
+			}
+			else {
+				current.push_back(1);
+			}
+		}
+		map.push_back(current);
+	}
+	return map;
+}
+
+#define MAX_TRIES 100000 // can be scaled down if it takes too much processing
+
+std::tuple<bool, Map> testUntilTrue(int mapX, int mapY, Coordinate robotBox, Coordinate start, Coordinate goal,
+	std::vector<Coordinate> &path) {
+	for (int i = 0; i < MAX_TRIES; i++) {
+		Map map(mapX, mapY);
+		PathFinder pf(map, robotBox);
+
+		if (pf.get_path_to_coordinate(start, goal, path)) {
+			return std::tuple<bool, Map>{true, map};
+		}
+	}
+
+	return std::tuple<bool, Map>{false, Map{}};
+}
+
 TEST(PathFinder, Constructor){
 	Map map(50, 50, 0);
 	Coordinate robotBox(1, 1);
@@ -67,22 +100,6 @@ TEST(PathFinder, without_Obstacles){
 	ASSERT_FALSE(path.empty());
 }
 
-#define MAX_TRIES 100000 // can be scaled down if it takes too much processing
-
-std::tuple<bool, Map> testUntilTrue(int mapX, int mapY, Coordinate robotBox, Coordinate start, Coordinate goal,
-	std::vector<Coordinate> &path) {
-	for (int i = 0; i < MAX_TRIES; i++) {
-		Map map(mapX, mapY);
-		PathFinder pf(map, robotBox);
-
-		if (pf.get_path_to_coordinate(start, goal, path)) {
-			return std::tuple<bool, Map>{true, map};
-		}
-	}
-
-	return std::tuple<bool, Map>{false, Map{}};
-}
-
 TEST(PathFinder, with_Obstacles){
     Coordinate robotBox(1, 1);
 	Coordinate start(0, 0);
@@ -107,20 +124,7 @@ TEST(PathFinder, consistent){
 }
 
 TEST(PathFinder, robot_Size){
-	std::vector<std::vector<int>> vector;
-	for (int i = 0; i < 100; i++) {
-		std::vector<int> current;
-		for (int j = 0; j < 100; j++) {
-			if (i-6 < j && i+6 > j){
-				current.push_back(0);
-			}
-			else {
-				current.push_back(1);
-			}
-		}
-		vector.push_back(current);
-	}
-	Map map(vector);
+	Map map(makeMap(7, 100, 100));
 	// size 0
 	Coordinate robotBox(0, 0);
 	PathFinder pf(map, robotBox);
@@ -139,21 +143,9 @@ TEST(PathFinder, robot_Size){
 }
 
 TEST(PathFinder, obstacle_On_Begin){
-	std::vector<std::vector<int>> vector;
-	for (int i = 0; i < 50; i++) {
-		std::vector<int> current;
-		for (int j = 0; j < 50; j++) {
-			if ((i - 2 < j && i + 2 > j) && (i != 0 && j != 0)){
-				current.push_back(0);
-			}
-			else {
-				current.push_back(1);
-			}
-		}
-		vector.push_back(current);
-	}
+	std::vector<std::vector<int>> vector = makeMap(1, 50, 50);
+	vector[0][0] = 1;
 	Map map(vector);
-	//map.printMap();
 	Coordinate robotBox(1, 1);
 	PathFinder pf(map, robotBox);
 
@@ -165,21 +157,9 @@ TEST(PathFinder, obstacle_On_Begin){
 }
 
 TEST(PathFinder, obstacle_On_End){
-	std::vector<std::vector<int>> vector;
-	for (int i = 0; i < 50; i++) {
-		std::vector<int> current;
-		for (int j = 0; j < 50; j++) {
-			if ( (i - 2 < j && i + 2 > j) && (i != 49 && j != 49) ){
-				current.push_back(0);
-			}
-			else {
-				current.push_back(1);
-			}
-		}
-		vector.push_back(current);
-	}
+	std::vector<std::vector<int>> vector = makeMap(1, 50, 50);
+	vector[49][49] = 1;
 	Map map(vector);
-	//map.printMap();
 	Coordinate robotBox(1, 1);
 	PathFinder pf(map, robotBox);
 
@@ -191,23 +171,9 @@ TEST(PathFinder, obstacle_On_End){
 }
 
 TEST(PathFinder, float){
-	std::vector<std::vector<int>> vector;
-	for (int i = 0; i < 50; i++) {
-		std::vector<int> current;
-		for (int j = 0; j < 50; j++) {
-			if (i - 2 < j && i + 2 > j){
-				current.push_back(0);
-			}
-			else {
-				current.push_back(1);
-			}
-		}
-		vector.push_back(current);
-	}
-	Map map(vector);
+	Map map(makeMap(2, 50, 50));
 	Coordinate robotBox(1, 1);
 	PathFinder pf(map, robotBox);
-
 	Coordinate start(0.06, 0.02);
 	Coordinate goal(49.2, 49.2);
 	std::vector<Coordinate> path;
@@ -216,20 +182,7 @@ TEST(PathFinder, float){
 }
 
 TEST(PathFinder, same_Begin_As_End){
-	std::vector<std::vector<int>> vector;
-	for (int i = 0; i < 50; i++) {
-		std::vector<int> current;
-		for (int j = 0; j < 50; j++) {
-			if (i - 2 < j && i + 2 > j){
-				current.push_back(0);
-			}
-			else {
-				current.push_back(1);
-			}
-		}
-		vector.push_back(current);
-	}
-	Map map(vector);
+	Map map(makeMap(1, 50, 50));
 	Coordinate robotBox(1, 1);
 	PathFinder pf(map, robotBox);
 
