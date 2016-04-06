@@ -1,6 +1,5 @@
-#include <limits.h>
 #include <iostream>
-#include "gtest\gtest.h"
+#include <gtest/gtest.h>
 #include <chrono>
 #include <thread>
 #include <fstream>
@@ -47,7 +46,7 @@ void printMapWithPath(std::ostream &out, Map &map, std::unordered_set<IntCoord> 
 bool equal(const std::vector<Coordinate> &lhs, const std::vector<Coordinate> &rhs){
 	EXPECT_EQ(lhs.size(), rhs.size()) << "size";
 	if (lhs.size() != rhs.size()) return false;
-	int size = lhs.size();
+	int size = int(lhs.size());
 	for (int i = 0; i < size; i++){
 		EXPECT_EQ(lhs[i].x, rhs[i].x) << "content.x @ " << i;
 		if (lhs[i].x != rhs[i].x) return false;
@@ -58,7 +57,7 @@ bool equal(const std::vector<Coordinate> &lhs, const std::vector<Coordinate> &rh
 }
 
 TEST(Pathfinding, Constructor){
-	Map map(50, 50, false);
+	Map map(50, 50, 0);
 	Coordinate robotBox(1, 1);
 	PathFinder pf(map, robotBox); 
 	
@@ -70,7 +69,7 @@ TEST(Pathfinding, Constructor){
 }
 
 TEST(Pathfinding, not_Existing_Begin){
-	Map map(50, 50, false);
+	Map map(50, 50, 0);
 	Coordinate robotBox(1, 1);
 	PathFinder pf(map, robotBox);
 
@@ -82,7 +81,7 @@ TEST(Pathfinding, not_Existing_Begin){
 }
 
 TEST(Pathfinding, not_Existing_End){
-	Map map(50, 50, false);
+	Map map(50, 50, 0);
 	Coordinate robotBox(1, 1);
 	PathFinder pf(map, robotBox);
 
@@ -94,7 +93,7 @@ TEST(Pathfinding, not_Existing_End){
 }
 
 TEST(Pathfinding, without_Obstacles){
-	Map map(50, 50, false);
+	Map map(50, 50, 0);
 	Coordinate robotBox(1, 1);
 	PathFinder pf(map, robotBox);
 
@@ -105,89 +104,98 @@ TEST(Pathfinding, without_Obstacles){
 	ASSERT_FALSE(path.empty()) << "path empty";
 }
 
+#define MAX_TRIES 1000 // can be scaled down if it takes too much processing
+
+std::tuple<bool, Map> testUntilTrue(int mapX, int mapY, Coordinate robotBox, Coordinate start, Coordinate goal,
+                                    std::vector<Coordinate> &path) {
+	for (int i = 0; i < MAX_TRIES; i++) {
+		Map map(mapX, mapY);
+		PathFinder pf(map, robotBox);
+
+		if (pf.get_path_to_coordinate(start, goal, path)) {
+			return std::tuple<bool, Map>{true, map};
+		}
+	}
+
+	return std::tuple<bool, Map>{false, Map{}};
+}
 
 TEST(Pathfinding, with_Obstacles){
-	Map map(50, 50);
 	Coordinate robotBox(1, 1);
-	PathFinder pf(map, robotBox);
 
 	Coordinate start(0, 0);
 	Coordinate goal(49, 49);
 	std::vector<Coordinate> path;
-	ASSERT_TRUE(pf.get_path_to_coordinate(start, goal, path)) << "path to coordinate";
+	ASSERT_TRUE(std::get<0>(testUntilTrue(50, 50, robotBox, start, goal, path))) << "path to coordinate";
 	ASSERT_FALSE(path.empty()) << "path empty";
 	// when function didn't found a path, make sure there wasn't a path, otherwise try again.
 }
 
 TEST(Pathfinding, Consistent){
-	Map map(50, 50);
 	Coordinate robotBox(1, 1);
-	PathFinder pf(map, robotBox);
 
 	Coordinate start(0, 0);
 	Coordinate goal(49, 49);
 	std::vector<Coordinate> path;
-	ASSERT_TRUE(pf.get_path_to_coordinate(start, goal, path)) << "path to coordinate";
+	std::tuple<bool, Map> result{testUntilTrue(50, 50, robotBox, start, goal, path)};
+	ASSERT_TRUE(std::get<0>(result)) << "path to coordinate";
 	ASSERT_FALSE(path.empty()) << "path empty";
 	std::vector<Coordinate> currentpath = path;
-	ASSERT_TRUE(pf.get_path_to_coordinate(start, goal, path)) << "path to coordinate";
+	PathFinder p2{std::get<1>(result), robotBox};
+	ASSERT_TRUE(p2.get_path_to_coordinate(start, goal, path)) << "path to coordinate";
 	ASSERT_TRUE(equal(currentpath, path));
 }
 
 TEST(Pathfinding, robot_Size){
 	// size 0
-	Map map(50, 50);
 	Coordinate robotBox(0, 0);
-	PathFinder pf(map, robotBox);
 
 	Coordinate start(0, 0);
 	Coordinate goal(49, 49);
 	std::vector<Coordinate> path;
-	ASSERT_TRUE(pf.get_path_to_coordinate(start, goal, path)) << "path to coordinate";
+	ASSERT_FALSE(std::get<0>(testUntilTrue(50, 50, robotBox, start, goal, path))) << "path to coordinate";
 	ASSERT_TRUE(path.empty()) << "path empty";
 
 	// size 10
 	robotBox.x = robotBox.y = 10;
-	PathFinder pf1(map, robotBox);
-	ASSERT_TRUE(pf1.get_path_to_coordinate(start, goal, path)) << "path to coordinate";
-	ASSERT_FALSE(path.empty()) << "path empty";
+	ASSERT_FALSE(std::get<0>(testUntilTrue(50, 50, robotBox, start, goal, path))) << "path to coordinate";
+	ASSERT_TRUE(path.empty()) << "path empty";
 }
 
 TEST(Pathfinding, obstacle_On_Begin){
-	// 
-	Map map(50, 50);
+	//
 	Coordinate robotBox(0, 0);
-	PathFinder pf(map, robotBox);
 
 	Coordinate start(0, 0);
 	Coordinate goal(49, 49);
 	std::vector<Coordinate> path;
-	ASSERT_TRUE(pf.get_path_to_coordinate(start, goal, path)) << "path to coordinate";
+	// the algorithm does not at this time support having an obstacle on the path
+	ASSERT_FALSE(std::get<0>(testUntilTrue(50, 50, robotBox, start, goal, path))) << "path to coordinate";
 	ASSERT_TRUE(path.empty()) << "path empty";
 
 }
 
 TEST(Pathfinding, obstacle_On_End){
 	//
-	Map map(50, 50);
 	Coordinate robotBox(0, 0);
-	PathFinder pf(map, robotBox);
 
 	Coordinate start(0, 0);
 	Coordinate goal(49, 49);
 	std::vector<Coordinate> path;
-	ASSERT_TRUE(pf.get_path_to_coordinate(start, goal, path)) << "path to coordinate";
+	ASSERT_FALSE(std::get<0>(testUntilTrue(50, 50, robotBox, start, goal, path))) << "path to coordinate";
 	ASSERT_TRUE(path.empty()) << "path empty";
 
 }
 
 int main(int argc, char **argv) {
-	std::cout << "Tests" << std::endl;
-
 	testing::InitGoogleTest(&argc, argv);
 	int result = RUN_ALL_TESTS();
+	if (result != 0) {
+		return result;
+	}
 
-	int mapX = 50, mapY = 50;
+	// debugging code for visualisation of paths
+	/*int mapX = 50, mapY = 50;
 	Map map{mapX, mapY};
 	PathFinder pathFinder{map, {.5, .5}};
 	std::vector<Coordinate> path;
@@ -213,6 +221,6 @@ int main(int argc, char **argv) {
 	map.printMap();
 #endif
 
-	std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	std::this_thread::sleep_for(std::chrono::milliseconds(100));*/
 	return 0;
 }

@@ -10,10 +10,14 @@ PathFinder::PathFinder(Map &map, Coordinate robotBox):
 }
 
 bool PathFinder::get_path_to_coordinate(Coordinate start, Coordinate goal, std::vector<Coordinate> &path) {
+	// do a check for end node accessibility before starting the search
+	if (!canVisit(goal)) {
+		return false;
+	}
+
 	// parent is at this point unknown for the start node, so construct it as unknown
 	CoordNode endNode{*this, goal, start, 0}, startNode{*this, start, start};
 	AStarSearch<CoordNode> search{endNode};
-	std::cout << start << " " << goal << std::endl;
 
 	std::shared_ptr<CoordNode> foundStart = search.search(startNode);
 	if (foundStart == nullptr) {
@@ -48,7 +52,9 @@ std::vector<PathFinder::CoordNode> PathFinder::CoordNode::getAvailableNodes(
 		for (int y = -1; y <= 1; y++) {
 			if (x != 0 || y != 0) {
 				// the grid will be relative to the end position of the search
-				Coordinate childPos{coord.x + x, coord.y + y}; // this will be replaced with an adt constructor
+				Coordinate childPos{coord.x + (x * pathFinder.robotBox.x / SQUARES_PER_ROBOT), coord.y + (y *
+				                                                                                          pathFinder.robotBox.y /
+				                                                                                          SQUARES_PER_ROBOT)}; // this will be replaced with an adt constructor
 				if (pathFinder.overlaps(childPos, startNodeCoord)) { //check whether the successor is the end node
 					childPos = {startNodeCoord.x, startNodeCoord.y};
 				}

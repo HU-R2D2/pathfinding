@@ -7,7 +7,8 @@
 
 #include <iostream>
 #include <random>
-#include <array>
+#include <vector>
+#include <ctime>
 
 class Map {
 public:
@@ -17,7 +18,7 @@ public:
 	std::vector<std::vector<int>> map;
 	int sizeX, sizeY;
 
-	Map(int x = 100, int y = 100, bool obstacles = true);
+	Map(int x = 100, int y = 100, float obstacles = 0.25f);
 	Map(std::vector < std::vector<int> > map);
 	void printMap();
 	bool hasObstacle(float x, float y, float sizeX, float sizeY);

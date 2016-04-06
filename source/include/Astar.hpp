@@ -12,7 +12,7 @@
 #include <memory>
 #include "PathFinder.hpp"
 
-#define MAX_SEARCH_NODES 10000000 // value has to be tested
+#define MAX_SEARCH_NODES 1000000 // value of 1,000,000 will support at most a map of 1000x1000 nodes
 
 template<typename T>
 class Node {
@@ -53,7 +53,6 @@ public:
 
 		while (!open.empty() && --giveUpCount >= 0) {
 			std::shared_ptr<T> curOpen{open[0]};
-//			std::cout << *curOpen << std::endl;
 			std::pop_heap(open.begin(), open.end(),
 			              [](std::shared_ptr<T> &n1, std::shared_ptr<T> &n2) { return *n1 > *n2; });
 			open.pop_back();
@@ -63,7 +62,6 @@ public:
 
 				auto result = closed.emplace(child);
 				if (result.second) {
-//					std::cout << **result.first << std::endl;
 					open.emplace_back(*result.first);
 					std::push_heap(open.begin(), open.end(),
 					               [](std::shared_ptr<T> &n1, std::shared_ptr<T> &n2) { return *n1 > *n2; });
