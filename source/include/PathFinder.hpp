@@ -79,7 +79,7 @@ private:
 	Map &map;
 	Coordinate robotBox;
 
-	bool canVisit(const Coordinate &pos);
+	bool canTravel(const Coordinate &from, const Coordinate &to);
 
 	bool overlaps(const Coordinate &c1, const Coordinate &c2);
 

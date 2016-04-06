@@ -11,8 +11,13 @@ PathFinder::PathFinder(Map &map, Coordinate robotBox):
 
 bool PathFinder::get_path_to_coordinate(Coordinate start, Coordinate goal, std::vector<Coordinate> &path) {
 	// do a check for end node accessibility before starting the search
-	if (!canVisit(goal)) {
+	if (!canTravel(goal, goal)) {
 		return false;
+	}
+	// check for the goal node being at the same coordinate as the start node
+	if (overlaps(start, goal)) {
+		path.clear();
+		return true;
 	}
 
 	// parent is at this point unknown for the start node, so construct it as unknown
@@ -52,13 +57,15 @@ std::vector<PathFinder::CoordNode> PathFinder::CoordNode::getAvailableNodes(
 		for (int y = -1; y <= 1; y++) {
 			if (x != 0 || y != 0) {
 				// the grid will be relative to the end position of the search
-				Coordinate childPos{coord.x + (x * pathFinder.robotBox.x / SQUARES_PER_ROBOT), coord.y + (y *
-				                                                                                          pathFinder.robotBox.y /
-				                                                                                          SQUARES_PER_ROBOT)}; // this will be replaced with an adt constructor
+				Coordinate childPos{coord.x + (x * pathFinder.robotBox.x /
+				                               SQUARES_PER_ROBOT),
+				                    coord.y + (y * pathFinder.robotBox.y /
+				                               SQUARES_PER_ROBOT)};
 				if (pathFinder.overlaps(childPos, startNodeCoord)) { //check whether the successor is the end node
 					childPos = {startNodeCoord.x, startNodeCoord.y};
 				}
-				if (pathFinder.canVisit(childPos)) {
+				// canTravel is used so that it can be ensured that there is no obstacle in the path
+				if (pathFinder.canTravel(coord, childPos)) {
 					children.push_back(
 							CoordNode{pathFinder, childPos, startNodeCoord,
 							          g + PathFinder::getHeuristic({float(x), float(y)}), // distance from the search begin
@@ -74,8 +81,14 @@ bool PathFinder::CoordNode::operator==(const PathFinder::CoordNode &lhs) const {
 	return coord.x == lhs.coord.x && coord.y == lhs.coord.y;
 }
 
-bool PathFinder::canVisit(const Coordinate &pos) {
-	return !map.hasObstacle(pos.x, pos.y, robotBox.x, robotBox.y);
+bool PathFinder::canTravel(const Coordinate &from, const Coordinate &to) {
+	Coordinate minCoord{
+			(from.x < to.x ? from.x : to.x),
+			(from.y < to.y ? from.y : to.y)};
+	Coordinate size{
+			(from.x > to.x ? from.x : to.x) - minCoord.x + robotBox.x,
+			(from.y > to.y ? from.y : to.y) - minCoord.y + robotBox.y};
+	return !map.hasObstacle(minCoord.x, minCoord.y, size.x, size.y);
 }
 
 bool PathFinder::overlaps(const Coordinate &c1, const Coordinate &c2) {
@@ -84,7 +97,6 @@ bool PathFinder::overlaps(const Coordinate &c1, const Coordinate &c2) {
 
 // define a constant as to speed the calculation up, in this case 10 digits is "good enough"
 #define SQ_ROOT_2 1.414213562f
-
 float PathFinder::getHeuristic(const Coordinate &dist) {
 	// diagonal distance
 	float xDist = dist.x < 0 ? -dist.x : dist.x;
