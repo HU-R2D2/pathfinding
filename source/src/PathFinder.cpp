@@ -13,7 +13,7 @@ bool PathFinder::get_path_to_coordinate(Coordinate start, Coordinate goal, std::
 	// parent is at this point unknown for the start node, so construct it as unknown
 	CoordNode endNode{*this, goal, start, 0}, startNode{*this, start, start};
 	AStarSearch<CoordNode> search{endNode};
-	std::cout << start << " " << goal << std::endl;
+	//std::cout << start << " " << goal << std::endl;
 
 	std::shared_ptr<CoordNode> foundStart = search.search(startNode);
 	if (foundStart == nullptr) {
