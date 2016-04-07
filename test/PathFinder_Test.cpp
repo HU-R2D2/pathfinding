@@ -35,6 +35,7 @@ std::vector<std::vector<int>> makeMap(int pathSize, int x, int y){
     return map;
 }
 
+
 #define MAX_TRIES 100000 // can be scaled down if it takes too much processing
 
 std::tuple<bool, Map> testUntilTrue(int mapX, int mapY, Coordinate robotBox, Coordinate start, Coordinate goal,
@@ -190,6 +191,25 @@ TEST(PathFinder, same_Begin_As_End){
     std::vector<Coordinate> path;
     ASSERT_TRUE(pf.get_path_to_coordinate(start, goal, path)) << start << " " << goal;
     ASSERT_TRUE(path.empty());
+}
+
+TEST(PathFinder, corner_Squeezing){
+	std::vector<std::vector<int>> cornerSqueeseMap;
+	for(int x = 0; x < 10; x++){
+		for(int y = 0; y < 10; y++){
+			if(x == y){cornerSqueeseMap[x][y] = 1;}
+			else{cornerSqueeseMap[x][y] = 0;}
+		}
+	}
+	Map map(cornerSqueeseMap);
+	Coordinate robotBox(1, 1);
+	PathFinder pf(map, robotBox);
+
+	Coordinate start(1, 1);
+	Coordinate goal(1, 1);
+	std::vector<Coordinate> path;
+	ASSERT_FALSE(pf.get_path_to_coordinate(start, goal, path)) << start << " " << goal;
+	ASSERT_TRUE(path.empty());
 }
 
 int main(int argc, char **argv) {
