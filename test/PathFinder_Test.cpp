@@ -198,8 +198,8 @@ TEST(PathFinder, corner_Squeezing){
 	std::vector<std::vector<int>> cornerSqueeseMap;
 	for(int x = 0; x < 10; x++){
 		for(int y = 0; y < 10; y++){
-			if(x == y){vector[x][y] = 1;}
-			else{vector[x][y] = 0;}
+			if(x == y){cornerSqueeseMap[x][y] = 1;}
+			else{cornerSqueeseMap[x][y] = 0;}
 		}
 	}
 	Map map(cornerSqueeseMap);
@@ -209,7 +209,7 @@ TEST(PathFinder, corner_Squeezing){
 	Coordinate start(1, 1);
 	Coordinate goal(1, 1);
 	std::vector<Coordinate> path;
-	ASSERT_FALES(pf.get_path_to_coordinate(start, goal, path)) << start << " " << goal;
+	ASSERT_FALSE(pf.get_path_to_coordinate(start, goal, path)) << start << " " << goal;
 	ASSERT_TRUE(path.empty());
 }
 
