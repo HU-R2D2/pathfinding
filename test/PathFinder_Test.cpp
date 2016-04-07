@@ -197,9 +197,14 @@ TEST(PathFinder, same_Begin_As_End){
 TEST(PathFinder, corner_Squeezing){
 	std::vector<std::vector<int>> cornerSqueeseMap;
 	for(int x = 0; x < 10; x++){
+		std::vector<int> current;
 		for(int y = 0; y < 10; y++){
-			if(x == y){cornerSqueeseMap[x][y] = 1;}
-			else{cornerSqueeseMap[x][y] = 0;}
+			if(x == y){
+				current.push_back(1);
+			}else{
+				current.push_back(0);
+			}
+			cornerSqueeseMap.push_back(current);
 		}
 	}
 	Map map(cornerSqueeseMap);
