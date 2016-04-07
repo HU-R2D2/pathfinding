@@ -10,25 +10,14 @@
 #include <cmath>
 #include "Dummy.hpp"
 #include "Astar.hpp"
+#include "../../../deps/adt/source/include/Coordinate.hpp"
+#include "../../../deps/adt/source/include/Length.hpp"
 
 // defines the amount of nodes that will be visited per length of the robot
 // for instance, if the robot has a size of 1m, and this value is 2, a node will
 // be opened every .5m
 #define SQUARES_PER_ROBOT 2
 
-class Coordinate {
-public:
-	Coordinate(float x, float y) :
-			x{x},
-			y{y} {
-	}
-	
-	float x, y;
-
-	friend std::ostream &operator<<(std::ostream &lhs, const Coordinate &rhs) {
-		return lhs << "(" << rhs.x << ", " << rhs.y << ")";
-	}
-};
 
 /**
  * interface for a pathfinder module
@@ -134,8 +123,8 @@ namespace std {
 	template<>
 	struct hash<Coordinate> {
 		std::size_t operator()(const Coordinate &coord) const {
-			return std::hash<float>()(coord.x)
-			       ^ (std::hash<float>()(coord.y) << (sizeof(float) / 2));
+			return std::hash<Length>()(coord.get_x())
+			       ^ (std::hash<Length>()(coord.get_y()) << (sizeof(float) / 2));
 		}
 	};
 
