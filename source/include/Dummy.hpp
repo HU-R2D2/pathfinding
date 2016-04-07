@@ -20,14 +20,14 @@ public:
 
 	Map(int x = 100, int y = 100, float obstacles = 0.25f);
 	Map(std::vector < std::vector<int> > map);
+
 	void printMap();
 	bool hasObstacle(float x, float y, float sizeX, float sizeY);
 	bool hasPassable(float x, float y, float sizeX, float sizeY);
 
 private:
-	std::mt19937_64 mersenne;
+	static std::mt19937_64 mersenne;
 
 };
-
 
 #endif //R2D2_PATHFINDING_DUMMY_HPP

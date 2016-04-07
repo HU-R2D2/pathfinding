@@ -4,9 +4,11 @@
 
 #include "../include/Dummy.hpp"
 
+std::mt19937_64 Map::mersenne = std::mt19937_64{(unsigned long) (time(0))};
+
 Map::Map(int x, int y, float obstacles) :
-		map{},
-		mersenne{(unsigned long) (time(0))} 
+		map{}
+//		mersenne{(unsigned long) (time(0))}
 {
 	map.reserve((unsigned long) (x));
 	sizeX = x, sizeY = y;
@@ -15,7 +17,8 @@ Map::Map(int x, int y, float obstacles) :
 		map[i1].reserve((unsigned long)(y));
 		for (int i2 = 0; i2 < y; i2++) {
 			map[i1].emplace_back();
-			map[i1][i2] = std::uniform_real_distribution<float>{}(mersenne) < obstacles ? 1 : 0;
+			map[i1][i2] = std::uniform_real_distribution<float>{}(mersenne)
+			              < obstacles ? 1 : 0;
 		}
 	}
 }
@@ -38,12 +41,11 @@ void Map::printMap() {
 }
 
 bool Map::hasObstacle(float x, float y, float boxSizeX, float boxSizeY) {
-	for (int i1 = 0; i1 < boxSizeX; i1++) {
-		for (int i2 = 0; i2 < boxSizeY; i2++) {
-			int getX = int(x + i1), getY = int(y + i2);
-			if (getX < 0 || getX >= sizeX ||
-			    getY < 0 || getY >= sizeY ||
-			    map[getX][getY] == 1 || map[getX][getY] == 2) {
+	for (int i1 = int(x); i1 <= int(x + boxSizeX); i1++) {
+		for (int i2 = int(y); i2 <= int(y + boxSizeY); i2++) {
+			if (i1 < 0 || i1 >= sizeX ||
+			    i2 < 0 || i2 >= sizeY ||
+			    map[i1][i2] == 1 || map[i1][i2] == 2) {
 				return true;
 			}
 		}
@@ -51,13 +53,12 @@ bool Map::hasObstacle(float x, float y, float boxSizeX, float boxSizeY) {
 	return false;
 }
 
-bool Map::hasPassable(float x, float y, float sizeX, float sizeY) {
-	for (int i1 = 0; i1 < sizeX; i1++) {
-		for (int i2 = 0; i2 < sizeY; i2++) {
-			int getX = int(x + i1), getY = int(y + i2);
-			if (getX < 0 && getX >= sizeX &&
-			    getY < 0 && getY >= sizeY &&
-			    map[getX][getY] == 0) {
+bool Map::hasPassable(float x, float y, float boxSizeX, float boxSizeY) {
+	for (int i1 = int(x); i1 < int(x + boxSizeX); i1++) {
+		for (int i2 = int(y); i2 < int(y + boxSizeY); i2++) {
+			if (i1 < 0 && i1 >= sizeX &&
+			    i2 < 0 && i2 >= sizeY &&
+			    map[i1][i2] == 0) {
 				return true;
 			}
 		}

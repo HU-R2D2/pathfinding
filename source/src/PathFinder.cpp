@@ -10,14 +10,14 @@ PathFinder::PathFinder(Map &map, Coordinate robotBox):
 }
 
 bool PathFinder::get_path_to_coordinate(Coordinate start, Coordinate goal, std::vector<Coordinate> &path) {
-	// do a check for end node accessibility before starting the search
-	if (!canTravel(goal, goal)) {
-		return false;
-	}
 	// check for the goal node being at the same coordinate as the start node
 	if (overlaps(start, goal)) {
 		path.clear();
 		return true;
+	}
+	// do a check for end node accessibility before starting the search
+	if (!canTravel(goal, goal)) {
+		return false;
 	}
 
 	// parent is at this point unknown for the start node, so construct it as unknown
@@ -33,6 +33,7 @@ bool PathFinder::get_path_to_coordinate(Coordinate start, Coordinate goal, std::
 		for (CoordNode &node : foundPath) {
 			path.push_back(node.coord);
 		}
+		smoothPath(path, start);
 		return true;
 	}
 }
@@ -51,7 +52,7 @@ PathFinder::CoordNode::CoordNode(
 }
 
 std::vector<PathFinder::CoordNode> PathFinder::CoordNode::getAvailableNodes(
-		std::shared_ptr<PathFinder::CoordNode> self) {
+		std::shared_ptr<PathFinder::CoordNode> &self) {
 	std::vector<CoordNode> children;
 	for (int x = -1; x <= 1; x++) {
 		for (int y = -1; y <= 1; y++) {
@@ -61,14 +62,18 @@ std::vector<PathFinder::CoordNode> PathFinder::CoordNode::getAvailableNodes(
 				                               SQUARES_PER_ROBOT),
 				                    coord.y + (y * pathFinder.robotBox.y /
 				                               SQUARES_PER_ROBOT)};
-				if (pathFinder.overlaps(childPos, startNodeCoord)) { //check whether the successor is the end node
+				//check whether the successor is the end node
+				if (pathFinder.overlaps(childPos, startNodeCoord)) {
 					childPos = {startNodeCoord.x, startNodeCoord.y};
 				}
-				// canTravel is used so that it can be ensured that there is no obstacle in the path
+				// canTravel is used so that it can be ensured that there is no
+				// obstacle in the path
 				if (pathFinder.canTravel(coord, childPos)) {
 					children.push_back(
 							CoordNode{pathFinder, childPos, startNodeCoord,
-							          g + PathFinder::getHeuristic({float(x), float(y)}), // distance from the search begin
+							          g + PathFinder::getHeuristic(
+									          {float(x), float(y)}
+							          ), // distance from the search begin
 							          self});
 				}
 			}
@@ -86,21 +91,26 @@ bool PathFinder::canTravel(const Coordinate &from, const Coordinate &to) {
 			(from.x < to.x ? from.x : to.x),
 			(from.y < to.y ? from.y : to.y)};
 	Coordinate size{
-			(from.x > to.x ? from.x : to.x) - minCoord.x + robotBox.x,
-			(from.y > to.y ? from.y : to.y) - minCoord.y + robotBox.y};
-	return !map.hasObstacle(minCoord.x, minCoord.y, size.x, size.y);
+			((from.x > to.x ? from.x : to.x) - minCoord.x) + robotBox.x,
+			((from.y > to.y ? from.y : to.y) - minCoord.y) + robotBox.y};
+	return !map.hasObstacle(minCoord.x - robotBox.x / 2,
+	                        minCoord.y - robotBox.y / 2,
+	                        size.x, size.y);
 }
 
 bool PathFinder::overlaps(const Coordinate &c1, const Coordinate &c2) {
-	return std::fabs(c1.x - c2.x) < robotBox.x / 2 && std::fabs(c1.y - c2.y) < robotBox.y / 2;
+	return std::fabs(c1.x - c2.x) < robotBox.x / 2 &&
+	       std::fabs(c1.y - c2.y) < robotBox.y / 2;
 }
 
-// define a constant as to speed the calculation up, in this case 10 digits is "good enough"
+// define a constant as to speed the calculation up,
+// in this case 10 digits is "good enough"
 #define SQ_ROOT_2 1.414213562f
-float PathFinder::getHeuristic(const Coordinate &dist) {
+
+float PathFinder::getHeuristic(const Coordinate &coord) {
 	// diagonal distance
-	float xDist = dist.x < 0 ? -dist.x : dist.x;
-	float yDist = dist.y < 0 ? -dist.y : dist.y;
+	float xDist = coord.x < 0 ? -coord.x : coord.x;
+	float yDist = coord.y < 0 ? -coord.y : coord.y;
 	float shortDist, longDist;
 	if (xDist < yDist) {
 		shortDist = xDist;
@@ -112,7 +122,8 @@ float PathFinder::getHeuristic(const Coordinate &dist) {
 	return shortDist * SQ_ROOT_2 + (longDist - shortDist);
 }
 
-std::vector<PathFinder::CoordNode> PathFinder::getPath(std::shared_ptr<PathFinder::CoordNode> start) {
+std::vector<PathFinder::CoordNode> PathFinder::getPath(
+		std::shared_ptr<PathFinder::CoordNode> start) {
 	std::shared_ptr<CoordNode> curNode = start;
 	std::vector<CoordNode> path;
 	while (!curNode->parent.expired()) {
@@ -122,3 +133,16 @@ std::vector<PathFinder::CoordNode> PathFinder::getPath(std::shared_ptr<PathFinde
 	return path;
 }
 
+void PathFinder::smoothPath(std::vector<Coordinate> &path, Coordinate start) {
+	Coordinate lastPos = start;
+	auto it = path.begin();
+	auto current = it++;
+	while (it != path.end()) {
+		if (canTravel(lastPos, *it)) {
+			path.erase(current);
+		} else {
+			lastPos = *it;
+			current = it++;
+		}
+	}
+}

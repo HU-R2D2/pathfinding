@@ -28,7 +28,7 @@ namespace std {
 	};
 }
 // prints out a .pgm (portable grey map) image of the map and it's path
-#define SCALE 2
+#define SCALE 4
 
 void printMapWithPath(std::ostream &out, Map &map,
                       std::unordered_set<IntCoord> path) {
@@ -50,14 +50,14 @@ void printMapWithPath(std::ostream &out, Map &map,
 
 int main() {
 	// debugging code for visualisation of paths
-	int mapX = 200, mapY = 200, mapCount = 0;
+	int mapX = 50, mapY = 50, mapCount = 0;
 	bool done = false;
 	while (!done) {
-		Map map = {mapX, mapY, .4f};
-		PathFinder pathFinder = {map, {1, 1}};
+		Map map = {mapX, mapY, .3};
+		PathFinder pathFinder = {map, {.5, .5}};
 		std::vector<Coordinate> path;
-		done = pathFinder.get_path_to_coordinate({5.0f, 5.0f},
-		                                         {mapX - 5.0f, mapY - 5.0f},
+		done = pathFinder.get_path_to_coordinate({5.5f, 5.5f},
+		                                         {mapX - 5.5f, mapY - 5.5f},
 		                                         path);
 		mapCount++;
 
