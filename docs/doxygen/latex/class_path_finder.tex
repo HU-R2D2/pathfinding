@@ -1,0 +1,86 @@
+\hypertarget{class_path_finder}{}\section{Path\+Finder Class Reference}
+\label{class_path_finder}\index{Path\+Finder@{Path\+Finder}}
+
+
+{\ttfamily \#include $<$Path\+Finder.\+hpp$>$}
+
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{class_path_finder_1_1_coord_node}{Coord\+Node}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_path_finder_a820a04a9ec65349b10cf21898bc89227}{Path\+Finder} (\hyperlink{class_map}{Map} \&map, Translation robot\+Box)
+\item 
+virtual bool \hyperlink{class_path_finder_acada549f3bc9792d9c4031484f017725}{get\+\_\+path\+\_\+to\+\_\+coordinate} (Coordinate start, Coordinate goal, std\+::vector$<$ Coordinate $>$ \&path)
+\item 
+\hyperlink{class_path_finder_a820a04a9ec65349b10cf21898bc89227}{Path\+Finder} (\hyperlink{class_map}{Map} \&map, Translation robot\+Box)
+\item 
+virtual bool \hyperlink{class_path_finder_a0c572b99f2c8cb944ebf49ad502cba7f}{get\+\_\+path\+\_\+to\+\_\+coordinate} (Coordinate start, Coordinate goal, std\+::vector$<$ Coordinate $>$ \&path)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+interface for a pathfinder module
+
+computes a path between two points on a map 
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Path\+Finder@{Path\+Finder}!Path\+Finder@{Path\+Finder}}
+\index{Path\+Finder@{Path\+Finder}!Path\+Finder@{Path\+Finder}}
+\subsubsection[{\texorpdfstring{Path\+Finder(\+Map \&map, Translation robot\+Box)}{PathFinder(Map &map, Translation robotBox)}}]{\setlength{\rightskip}{0pt plus 5cm}Path\+Finder\+::\+Path\+Finder (
+\begin{DoxyParamCaption}
+\item[{{\bf Map} \&}]{map, }
+\item[{Translation}]{robot\+Box}
+\end{DoxyParamCaption}
+)}\hypertarget{class_path_finder_a820a04a9ec65349b10cf21898bc89227}{}\label{class_path_finder_a820a04a9ec65349b10cf21898bc89227}
+Constructor
+
+/param map Reference to the world map /param robot\+Size Reference to the robot size \index{Path\+Finder@{Path\+Finder}!Path\+Finder@{Path\+Finder}}
+\index{Path\+Finder@{Path\+Finder}!Path\+Finder@{Path\+Finder}}
+\subsubsection[{\texorpdfstring{Path\+Finder(\+Map \&map, Translation robot\+Box)}{PathFinder(Map &map, Translation robotBox)}}]{\setlength{\rightskip}{0pt plus 5cm}Path\+Finder\+::\+Path\+Finder (
+\begin{DoxyParamCaption}
+\item[{{\bf Map} \&}]{map, }
+\item[{Translation}]{robot\+Box}
+\end{DoxyParamCaption}
+)}\hypertarget{class_path_finder_a820a04a9ec65349b10cf21898bc89227}{}\label{class_path_finder_a820a04a9ec65349b10cf21898bc89227}
+Constructor
+
+/param map Reference to the world map /param robot\+Size Reference to the robot size 
+
+\subsection{Member Function Documentation}
+\index{Path\+Finder@{Path\+Finder}!get\+\_\+path\+\_\+to\+\_\+coordinate@{get\+\_\+path\+\_\+to\+\_\+coordinate}}
+\index{get\+\_\+path\+\_\+to\+\_\+coordinate@{get\+\_\+path\+\_\+to\+\_\+coordinate}!Path\+Finder@{Path\+Finder}}
+\subsubsection[{\texorpdfstring{get\+\_\+path\+\_\+to\+\_\+coordinate(\+Coordinate start, Coordinate goal, std\+::vector$<$ Coordinate $>$ \&path)}{get_path_to_coordinate(Coordinate start, Coordinate goal, std::vector< Coordinate > &path)}}]{\setlength{\rightskip}{0pt plus 5cm}bool Path\+Finder\+::get\+\_\+path\+\_\+to\+\_\+coordinate (
+\begin{DoxyParamCaption}
+\item[{Coordinate}]{start, }
+\item[{Coordinate}]{goal, }
+\item[{std\+::vector$<$ Coordinate $>$ \&}]{path}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{class_path_finder_acada549f3bc9792d9c4031484f017725}{}\label{class_path_finder_acada549f3bc9792d9c4031484f017725}
+Returns a path between two points
+
+This function computes a path from start to goal, based on the map and robot size given in the constructor
+
+/param start The start coordinate /param goal The goal coordinate /param path Vector where the path need to be written to /return If it was able to find a path \index{Path\+Finder@{Path\+Finder}!get\+\_\+path\+\_\+to\+\_\+coordinate@{get\+\_\+path\+\_\+to\+\_\+coordinate}}
+\index{get\+\_\+path\+\_\+to\+\_\+coordinate@{get\+\_\+path\+\_\+to\+\_\+coordinate}!Path\+Finder@{Path\+Finder}}
+\subsubsection[{\texorpdfstring{get\+\_\+path\+\_\+to\+\_\+coordinate(\+Coordinate start, Coordinate goal, std\+::vector$<$ Coordinate $>$ \&path)}{get_path_to_coordinate(Coordinate start, Coordinate goal, std::vector< Coordinate > &path)}}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool Path\+Finder\+::get\+\_\+path\+\_\+to\+\_\+coordinate (
+\begin{DoxyParamCaption}
+\item[{Coordinate}]{start, }
+\item[{Coordinate}]{goal, }
+\item[{std\+::vector$<$ Coordinate $>$ \&}]{path}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{class_path_finder_a0c572b99f2c8cb944ebf49ad502cba7f}{}\label{class_path_finder_a0c572b99f2c8cb944ebf49ad502cba7f}
+Returns a path between two points
+
+This function computes a path from start to goal, based on the map and robot size given in the constructor
+
+/param start The start coordinate /param goal The goal coordinate /param path Vector where the path need to be written to /return If it was able to find a path 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+source/include/Path\+Finder.\+hpp\item 
+source/src/main.\+cpp\item 
+source/src/Path\+Finder.\+cpp\end{DoxyCompactItemize}

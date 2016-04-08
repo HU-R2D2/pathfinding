@@ -41,9 +41,9 @@
 #include <cmath>
 #include "../include/Dummy.hpp"
 #include "../include/Astar.hpp"
-#include "../../../deps/adt/source/include/Coordinate.hpp"
-#include "../../../deps/adt/source/include/Length.hpp"
-#include "../../../deps/adt/source/include/Translation.hpp"
+#include "../../../adt/source/include/Coordinate.hpp"
+#include "../../../adt/source/include/Length.hpp"
+#include "../../../adt/source/include/Translation.hpp"
 
 // defines the amount of nodes that will be visited per length of the robot
 // for instance, if the robot has a size of 1m, and this value is 2, a node will

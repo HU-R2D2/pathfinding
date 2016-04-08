@@ -38,8 +38,8 @@
 #include <random>
 #include <vector>
 #include <ctime>
-#include "../../../deps/adt/source/include/Coordinate.hpp"
-#include "../../../deps/adt/source/include/Translation.hpp"
+#include "../../../adt/source/include/Coordinate.hpp"
+#include "../../../adt/source/include/Translation.hpp"
 
 //! Dummy Map
 /*!
