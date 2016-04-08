@@ -49,7 +49,7 @@ public:
 	 *
 	 * /param self this
 	 */
-	virtual std::vector<T> getAvailableNodes(std::shared_ptr<T> &self) = 0;
+	virtual std::vector<T> get_available_nodes(std::shared_ptr<T> &self) = 0;
 
 	/**
 	 * compares two nodes for checking which should be evaluated first
@@ -101,7 +101,7 @@ public:
 			              });
 			open.pop_back();
 
-			for (T &c : curOpen->getAvailableNodes(curOpen)) {
+			for (T &c : curOpen->get_available_nodes(curOpen)) {
 				std::shared_ptr<T> child{std::make_shared<T>(c)};
 
 				auto result = closed.emplace(child);

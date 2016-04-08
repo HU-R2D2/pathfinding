@@ -42,7 +42,7 @@
 
 //! Dummy Map
 /*!
-* Map to test the pathfinder
+* Map for testing the pathfinder
 */
 class Map {
 public:
@@ -70,7 +70,7 @@ public:
 	/*!
 	* /return void
 	*/
-	void printMap();
+	void print_map();
 
 	//! Returns if position on the map has a obstacle within the robot size
 	/*!
@@ -80,7 +80,7 @@ public:
 	* /param sizeY The height of the robot
 	* /return If there is a obstacle found
 	*/
-	bool hasObstacle(Coordinate coord, Translation size);
+	bool has_obstacle(Coordinate coord, Translation size);
 
 	//! Returns if position on the map has a passable erea within the robot size
 	/*!
@@ -90,7 +90,7 @@ public:
 	* /param sizeY The height of the robot
 	* /return If there is a passable erea
 	*/
-	bool hasPassable(Coordinate coord, Translation size);
+	bool has_passable(Coordinate coord, Translation size);
 
 private:
 	static std::mt19937_64 mersenne;

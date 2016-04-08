@@ -26,7 +26,7 @@ bool equal(const std::vector<Coordinate> &lhs,
 	return true;
 }
 
-std::vector<std::vector<int>> makeMap(int pathSize, int x, int y) {
+std::vector<std::vector<int>> make_map(int pathSize, int x, int y) {
 	std::vector<std::vector<int>> map;
 	for (int i = 0; i < x; i++) {
 		std::vector<int> current;
@@ -45,7 +45,7 @@ std::vector<std::vector<int>> makeMap(int pathSize, int x, int y) {
 
 #define MAX_TRIES 10000 // can be scaled down if it takes too much processing
 
-std::tuple<bool, Map> testUntilTrue(int mapX, int mapY, Translation robotBox,
+std::tuple<bool, Map> test_until_true(int mapX, int mapY, Translation robotBox,
                                     Coordinate start, Coordinate goal,
                                     std::vector<Coordinate> &path) {
 	for (int i = 0; i < MAX_TRIES; i++) {
@@ -59,7 +59,7 @@ std::tuple<bool, Map> testUntilTrue(int mapX, int mapY, Translation robotBox,
 	return std::tuple<bool, Map>{false, Map{}};
 }
 
-TEST(PathFinder, Constructor) {
+TEST(PathFinder, constructor) {
 	Map map(50, 50, 0);
 	Translation robotBox{.5 * Length::METER, .5 * Length::METER,
 	                     0 * Length::METER};
@@ -75,7 +75,7 @@ TEST(PathFinder, Constructor) {
 
 }
 
-TEST(PathFinder, not_Existing_Begin) {
+TEST(PathFinder, not_existing_begin) {
 	Map map(50, 50, 0);
 	Translation robotBox{.5 * Length::METER, .5 * Length::METER,
 	                     0 * Length::METER};
@@ -90,7 +90,7 @@ TEST(PathFinder, not_Existing_Begin) {
 	ASSERT_TRUE(path.empty());
 }
 
-TEST(PathFinder, not_Existing_End) {
+TEST(PathFinder, not_existing_end) {
 	Map map(50, 50, 0);
 	Translation robotBox{.5 * Length::METER, .5 * Length::METER, 0 *
 	                                                             Length::METER};
@@ -106,7 +106,7 @@ TEST(PathFinder, not_Existing_End) {
 	ASSERT_TRUE(path.empty());
 }
 
-TEST(PathFinder, without_Obstacles) {
+TEST(PathFinder, without_obstacles) {
 	Map map(50, 50, 0);
 	Translation robotBox{.5 * Length::METER, .5 * Length::METER,
 	                     0 * Length::METER};
@@ -121,14 +121,14 @@ TEST(PathFinder, without_Obstacles) {
 	ASSERT_FALSE(path.empty());
 }
 
-TEST(PathFinder, with_Obstacles) {
+TEST(PathFinder, with_obstacles) {
 	Translation robotBox{.5 * Length::METER, .5 * Length::METER,
 	                     0 * Length::METER};
 	Coordinate start{.5 * Length::METER, .5 * Length::METER, 0 * Length::METER};
 	Coordinate goal{49.5 * Length::METER, 49.5 * Length::METER,
 	                0 * Length::METER};
 	std::vector<Coordinate> path;
-	ASSERT_TRUE(std::get<0>(testUntilTrue(50, 50, robotBox, start, goal, path)))
+	ASSERT_TRUE(std::get<0>(test_until_true(50, 50, robotBox, start, goal, path)))
 								<< start << " " << goal;;
 	ASSERT_FALSE(path.empty());
 }
@@ -141,7 +141,7 @@ TEST(PathFinder, consistent) {
 	                0 * Length::METER};
 	std::vector<Coordinate> path;
 	std::tuple<bool, Map> result{
-			testUntilTrue(50, 50, robotBox, start, goal, path)
+			test_until_true(50, 50, robotBox, start, goal, path)
 	};
 	ASSERT_TRUE(std::get<0>(result)) << start << " " << goal << " first time";
 	ASSERT_FALSE(path.empty()) << "path empty";
@@ -152,7 +152,7 @@ TEST(PathFinder, consistent) {
 	ASSERT_TRUE(equal(currentpath, path));
 }
 
-TEST(PathFinder, robot_Size) {
+TEST(PathFinder, robot_size) {
 	Map map{100, 100, 0};
 	// size 0
 	Translation robotBox{0 * Length::METER, 0 * Length::METER,
@@ -177,8 +177,8 @@ TEST(PathFinder, robot_Size) {
 	ASSERT_FALSE(path.empty());
 }
 
-TEST(PathFinder, obstacle_On_Begin) {
-	std::vector<std::vector<int>> vector = makeMap(1, 50, 50);
+TEST(PathFinder, obstacle_on_begin) {
+	std::vector<std::vector<int>> vector = make_map(1, 50, 50);
 	vector[0][0] = 1;
 	Map map(vector);
 	Translation robotBox{.5 * Length::METER, .5 * Length::METER,
@@ -194,8 +194,8 @@ TEST(PathFinder, obstacle_On_Begin) {
 	ASSERT_TRUE(path.empty());
 }
 
-TEST(PathFinder, obstacle_On_End) {
-	std::vector<std::vector<int>> vector = makeMap(1, 50, 50);
+TEST(PathFinder, obstacle_on_end) {
+	std::vector<std::vector<int>> vector = make_map(1, 50, 50);
 	vector[49][49] = 1;
 	Map map(vector);
 	Translation robotBox{.5 * Length::METER, .5 * Length::METER,
@@ -212,7 +212,7 @@ TEST(PathFinder, obstacle_On_End) {
 }
 
 TEST(PathFinder, float) {
-	Map map(makeMap(2, 50, 50));
+	Map map(make_map(2, 50, 50));
 	Translation robotBox{.5 * Length::METER, .5 * Length::METER,
 	                     0 * Length::METER};
 	PathFinder pf(map, robotBox);
@@ -226,8 +226,8 @@ TEST(PathFinder, float) {
 	ASSERT_FALSE(path.empty());
 }
 
-TEST(PathFinder, same_Begin_As_End) {
-	Map map(makeMap(1, 50, 50));
+TEST(PathFinder, same_begin_as_end) {
+	Map map(make_map(1, 50, 50));
 	Translation robotBox{.5 * Length::METER, .5 * Length::METER,
 	                     0 * Length::METER};
 	PathFinder pf(map, robotBox);
@@ -241,7 +241,7 @@ TEST(PathFinder, same_Begin_As_End) {
 	ASSERT_TRUE(path.empty());
 }
 
-TEST(PathFinder, corner_Squeezing) {
+TEST(PathFinder, corner_squeezing) {
 	std::vector<std::vector<int>> cornerSqueezeMap;
 	for (int x = 0; x < 10; x++) {
 		std::vector<int> current;
