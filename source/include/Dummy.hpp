@@ -1,16 +1,18 @@
-////
-// Roborescue
-//
+////                                                                                                                                        
+// \project Roborescue
+// \package Pathfinding
+// 
 // \file Dummy.hpp
-// \date Created: 30-3-16
-// \version <0.0.0>
+// \date Created: 05-04-2016
+// \version 0.1.0
 //
-// \author Jasper Schoenmaker, Chiel Douwes
+// \author Jasper Schoenmaker 1661818
+// \author Chiel Douwens 1666311
 //
 // \section LICENSE
 // License: newBSD
 //
-// Copyright � 2016, HU University of Applied Sciences Utrecht.
+// Copyright © 2016, HU University of Applied Sciences Utrecht.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -29,7 +31,6 @@
 // LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ////
-
 #ifndef R2D2_PATHFINDING_DUMMY_HPP
 #define R2D2_PATHFINDING_DUMMY_HPP
 
@@ -37,10 +38,12 @@
 #include <random>
 #include <vector>
 #include <ctime>
+#include "../../../deps/adt/source/include/Coordinate.hpp"
+#include "../../../deps/adt/source/include/Translation.hpp"
 
 //! Dummy Map
 /*!
-* Map to test the pathfinder
+* Map for testing the pathfinder
 */
 class Map {
 public:
@@ -68,7 +71,7 @@ public:
 	/*!
 	* /return void
 	*/
-	void printMap();
+	void print_map();
 
 	//! Returns if position on the map has a obstacle within the robot size
 	/*!
@@ -78,7 +81,7 @@ public:
 	* /param sizeY The height of the robot
 	* /return If there is a obstacle found
 	*/
-	bool hasObstacle(float x, float y, float sizeX, float sizeY);
+	bool has_obstacle(Coordinate coord, Translation size);
 
 	//! Returns if position on the map has a passable erea within the robot size
 	/*!
@@ -88,7 +91,7 @@ public:
 	* /param sizeY The height of the robot
 	* /return If there is a passable erea
 	*/
-	bool hasPassable(float x, float y, float sizeX, float sizeY);
+	bool has_passable(Coordinate coord, Translation size);
 
 private:
 	static std::mt19937_64 mersenne;

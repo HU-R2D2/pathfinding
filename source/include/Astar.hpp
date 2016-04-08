@@ -1,6 +1,36 @@
+////                                                                                                                                        
+// \project Roborescue
+// \package Pathfinding
+// 
+// \file Astar.hpp
+// \date Created: 29-03-2016
+// \version 0.1.0
 //
-// Created by chiel on 30-3-16.
+// \author Jasper Schoenmaker 1661818
+// \author Chiel Douwens 1666311
 //
+// \section LICENSE
+// License: newBSD
+//
+// Copyright © 2016, HU University of Applied Sciences Utrecht.
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+// - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+// - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+// - Neither the name of the HU University of Applied Sciences Utrecht nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE HU UNIVERSITY OF APPLIED SCIENCES UTRECHT
+// BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+// GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+// OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+////
 
 #ifndef R2D2_PATHFINDING_ASTAR_HPP
 #define R2D2_PATHFINDING_ASTAR_HPP
@@ -25,16 +55,16 @@ public:
 	/**
 	 * creates a new node with predefined values as the variables
 	 */
-	Node(float g = 0, float h = 0, std::weak_ptr<T> parent = std::weak_ptr<T>())
-			:
+	Node(Length g = Length::METER * 0, Length h = Length::METER * 0,
+	     std::weak_ptr<T> parent = std::weak_ptr<T>()):
 			g{ g },
 			h{ h },
 			f{ g + h },
 			parent{ parent } {
 	}
 
-	const float g;
-	float h, f;
+	const Length g;
+	Length h, f;
 	const std::weak_ptr<T> parent;
 
 	/**
@@ -49,7 +79,7 @@ public:
 	 *
 	 * /param self this
 	 */
-	virtual std::vector<T> getAvailableNodes(std::shared_ptr<T> &self) = 0;
+	virtual std::vector<T> get_available_nodes(std::shared_ptr<T> &self) = 0;
 
 	/**
 	 * compares two nodes for checking which should be evaluated first
@@ -101,7 +131,7 @@ public:
 			              });
 			open.pop_back();
 
-			for (T &c : curOpen->getAvailableNodes(curOpen)) {
+			for (T &c : curOpen->get_available_nodes(curOpen)) {
 				std::shared_ptr<T> child{std::make_shared<T>(c)};
 
 				auto result = closed.emplace(child);
