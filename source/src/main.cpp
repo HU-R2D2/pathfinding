@@ -74,7 +74,7 @@ int main() {
 			std::unordered_set<IntCoord> intPath;
 			for (Coordinate &coord : path) {
 				std::cout << coord << std::endl;
-				intPath.emplace(coord.get_x() * SCALE, coord.get_y() * SCALE);
+				intPath.emplace(coord.get_x() / Length::METER * SCALE, coord.get_y() / Length::METER * SCALE);
 			}
 			std::cout.flush();
 

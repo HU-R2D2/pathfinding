@@ -25,7 +25,7 @@ public:
 	/**
 	 * creates a new node with predefined values as the variables
 	 */
-	Node(float g = 0, float h = 0, std::weak_ptr<T> parent = std::weak_ptr<T>())
+	Node(Length g = Length::METER * 0, Length h = Length::METER * 0, std::weak_ptr<T> parent = std::weak_ptr<T>())
 			:
 			g{ g },
 			h{ h },
@@ -33,8 +33,8 @@ public:
 			parent{ parent } {
 	}
 
-	const float g;
-	float h, f;
+	const Length g;
+	Length h, f;
 	const std::weak_ptr<T> parent;
 
 	/**
