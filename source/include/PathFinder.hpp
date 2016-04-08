@@ -63,7 +63,7 @@ public:
 
 		virtual bool operator==(const CoordNode &lhs) const override;
 
-		virtual std::vector<CoordNode> getAvailableNodes(
+		virtual std::vector<CoordNode> get_available_nodes(
 				std::shared_ptr<CoordNode> &self) override;
 
 		PathFinder &pathFinder;
@@ -91,7 +91,7 @@ private:
 	 * @return true if it is guaranteed that the robot can travel from "from" to
 	 *         "to"
 	 */
-	bool canTravel(const Coordinate &from, const Coordinate &to);
+	bool can_travel(const Coordinate &from, const Coordinate &to);
 
 	/**
 	 * check whether a coordinate will be overlapped by the robot when
@@ -112,11 +112,11 @@ private:
 	 * @param coord the coordinate that should be calculated the length for
 	 * @return the distance from orgin to "coord"
 	 */
-	static Length getHeuristic(Translation coord);
+	static Length get_heuristic(Translation coord);
 
-	std::vector<CoordNode> getPath(std::shared_ptr<CoordNode> start);
+	std::vector<CoordNode> get_path(std::shared_ptr<CoordNode> start);
 
-	void smoothPath(std::vector<Coordinate> &path, Coordinate start);
+	void smooth_path(std::vector<Coordinate> &path, Coordinate start);
 };
 
 namespace std {

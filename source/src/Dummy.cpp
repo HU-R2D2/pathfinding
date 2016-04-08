@@ -31,7 +31,7 @@ Map::Map(std::vector<std::vector<int>> map) :
 {
 }
 
-void Map::printMap() {
+void Map::print_map() {
 	for (int i1 = 0; i1 < sizeX; i1++) {
 		for (int i2 = 0; i2 < sizeY; i2++) {
 			std::cout << map[i1][i2];
@@ -40,7 +40,7 @@ void Map::printMap() {
 	}
 }
 
-bool Map::hasObstacle(Coordinate coord, Translation size) {
+bool Map::has_obstacle(Coordinate coord, Translation size) {
 	for (int i1 = int(coord.get_x() / Length::METER); i1 <= int((coord.get_x() + size.get_x()) / Length::METER); i1++) {
 		for (int i2 = int(coord.get_y() / Length::METER); i2 <= int((coord.get_y() + size.get_y()) / Length::METER); i2++) {
 			if (i1 < 0 || i1 >= sizeX ||
@@ -53,7 +53,7 @@ bool Map::hasObstacle(Coordinate coord, Translation size) {
 	return false;
 }
 
-bool Map::hasPassable(Coordinate coord, Translation size) {
+bool Map::has_passable(Coordinate coord, Translation size) {
 	for (int i1 = int(coord.get_x() / Length::METER); i1 <= int((coord.get_x() + size.get_x()) / Length::METER); i1++) {
 		for (int i2 = int(coord.get_y() / Length::METER); i2 <= int((coord.get_y() + size.get_y()) / Length::METER); i2++) {
 			if (i1 < 0 && i1 >= sizeX &&
