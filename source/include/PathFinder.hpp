@@ -12,6 +12,7 @@
 #include "Astar.hpp"
 #include "../../../deps/adt/source/include/Coordinate.hpp"
 #include "../../../deps/adt/source/include/Length.hpp"
+#include "../../../deps/adt/source/include/Translation.hpp"
 
 // defines the amount of nodes that will be visited per length of the robot
 // for instance, if the robot has a size of 1m, and this value is 2, a node will
@@ -32,7 +33,7 @@ public:
 	 * /param map Reference to the world map
 	 * /param robotSize Reference to the robot size
 	 */
-	PathFinder(Map &map, Coordinate robotBox);
+	PathFinder(Map &map, Translation robotBox);
 
 	/**
 	 * Returns a path between two points
@@ -57,7 +58,7 @@ public:
 	public:
 		CoordNode(PathFinder &pathFinder, Coordinate coord,
 		          Coordinate &startCoord,
-		          float g = std::numeric_limits<float>::infinity(),
+		          Length g = Length::METER * std::numeric_limits<double>::infinity(),
 		          std::weak_ptr<CoordNode> parent = {});
 
 		virtual bool operator==(const CoordNode &lhs) const override;
@@ -77,7 +78,7 @@ public:
 
 private:
 	Map &map;
-	Coordinate robotBox;
+	Translation robotBox;
 
 	/**
 	 * test whether it is possible to travel from "from" directly to "to"
@@ -111,7 +112,7 @@ private:
 	 * @param coord the coordinate that should be calculated the length for
 	 * @return the distance from orgin to "coord"
 	 */
-	static float getHeuristic(const Coordinate &coord);
+	static Length getHeuristic(Translation coord);
 
 	std::vector<CoordNode> getPath(std::shared_ptr<CoordNode> start);
 
@@ -123,8 +124,8 @@ namespace std {
 	template<>
 	struct hash<Coordinate> {
 		std::size_t operator()(const Coordinate &coord) const {
-			return std::hash<Length>()(coord.get_x())
-			       ^ (std::hash<Length>()(coord.get_y()) << (sizeof(float) / 2));
+			return std::hash<double>()(coord.get_x() / Length::METER)
+			       ^ (std::hash<double>()(coord.get_y() / Length::METER) << (sizeof(double) / 2));
 		}
 	};
 

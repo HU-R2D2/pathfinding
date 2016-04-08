@@ -37,6 +37,8 @@
 #include <random>
 #include <vector>
 #include <ctime>
+#include "../../../deps/adt/source/include/Coordinate.hpp"
+#include "../../../deps/adt/source/include/Translation.hpp"
 
 //! Dummy Map
 /*!
@@ -78,7 +80,7 @@ public:
 	* /param sizeY The height of the robot
 	* /return If there is a obstacle found
 	*/
-	bool hasObstacle(float x, float y, float sizeX, float sizeY);
+	bool hasObstacle(Coordinate coord, Translation size);
 
 	//! Returns if position on the map has a passable erea within the robot size
 	/*!
@@ -88,7 +90,7 @@ public:
 	* /param sizeY The height of the robot
 	* /return If there is a passable erea
 	*/
-	bool hasPassable(float x, float y, float sizeX, float sizeY);
+	bool hasPassable(Coordinate coord, Translation size);
 
 private:
 	static std::mt19937_64 mersenne;

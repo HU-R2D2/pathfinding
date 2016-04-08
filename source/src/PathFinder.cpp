@@ -4,7 +4,7 @@
 
 #include "../include/PathFinder.hpp"
 
-PathFinder::PathFinder(Map &map, Coordinate robotBox):
+PathFinder::PathFinder(Map &map, Translation robotBox):
 		map(map),
 		robotBox(robotBox) {
 }
@@ -21,7 +21,7 @@ bool PathFinder::get_path_to_coordinate(Coordinate start, Coordinate goal, std::
 	}
 
 	// parent is at this point unknown for the start node, so construct it as unknown
-	CoordNode endNode{*this, goal, start, 0}, startNode{*this, start, start};
+	CoordNode endNode{*this, goal, start, 0 * Length::METER}, startNode{*this, start, start};
 	AStarSearch<CoordNode> search{endNode};
 
 	std::shared_ptr<CoordNode> foundStart = search.search(startNode);
@@ -40,11 +40,9 @@ bool PathFinder::get_path_to_coordinate(Coordinate start, Coordinate goal, std::
 
 PathFinder::CoordNode::CoordNode(
 		PathFinder &pathFinder, Coordinate coord,
-		Coordinate &startCoord, float g, std::weak_ptr<CoordNode> parent) :
-		Node(g, PathFinder::getHeuristic(
-				{startCoord.x - coord.x, // minimum distance to the search end
-				 startCoord.y - coord.y}),
-		     parent),
+		Coordinate &startCoord, Length g, std::weak_ptr<CoordNode> parent) :
+		Node{g, PathFinder::getHeuristic(startCoord - coord),
+		     parent},
 		pathFinder(pathFinder),
 		coord(coord),
 		startNodeCoord(startCoord) {
@@ -58,13 +56,15 @@ std::vector<PathFinder::CoordNode> PathFinder::CoordNode::getAvailableNodes(
 		for (int y = -1; y <= 1; y++) {
 			if (x != 0 || y != 0) {
 				// the grid will be relative to the end position of the search
-				Coordinate childPos{coord.x + (x * pathFinder.robotBox.x /
-				                               SQUARES_PER_ROBOT),
-				                    coord.y + (y * pathFinder.robotBox.y /
-				                               SQUARES_PER_ROBOT)};
+				Coordinate childPos{
+						coord + (Translation{
+								x * pathFinder.robotBox.get_x(),
+						        y * pathFinder.robotBox.get_y(),
+						        0 * Length::METER
+						} / SQUARES_PER_ROBOT)};
 				//check whether the successor is the end node
 				if (pathFinder.overlaps(childPos, startNodeCoord)) {
-					childPos = {startNodeCoord.x, startNodeCoord.y};
+					childPos = {startNodeCoord};
 				}
 				// canTravel is used so that it can be ensured that there is no
 				// obstacle in the path
@@ -72,7 +72,9 @@ std::vector<PathFinder::CoordNode> PathFinder::CoordNode::getAvailableNodes(
 					children.push_back(
 							CoordNode{pathFinder, childPos, startNodeCoord,
 							          g + PathFinder::getHeuristic(
-									          {float(x), float(y)}
+									          {x * Length::METER,
+									           y * Length::METER,
+									           0 * Length::METER}
 							          ), // distance from the search begin
 							          self});
 				}
@@ -83,35 +85,42 @@ std::vector<PathFinder::CoordNode> PathFinder::CoordNode::getAvailableNodes(
 }
 
 bool PathFinder::CoordNode::operator==(const PathFinder::CoordNode &lhs) const {
-	return coord.x == lhs.coord.x && coord.y == lhs.coord.y;
+	return (coord - lhs.coord).get_length() / Length::METER == 0;
 }
 
 bool PathFinder::canTravel(const Coordinate &from, const Coordinate &to) {
 	Coordinate minCoord{
-			(from.x < to.x ? from.x : to.x),
-			(from.y < to.y ? from.y : to.y)};
-	Coordinate size{
-			((from.x > to.x ? from.x : to.x) - minCoord.x) + robotBox.x,
-			((from.y > to.y ? from.y : to.y) - minCoord.y) + robotBox.y};
-	return !map.hasObstacle(minCoord.x - robotBox.x / 2,
-	                        minCoord.y - robotBox.y / 2,
-	                        size.x, size.y);
+			(from.get_x() < to.get_x() ? from.get_x() : to.get_x()),
+			(from.get_y() < to.get_y() ? from.get_y() : to.get_y()),
+			0 * Length::METER};
+	Translation size{(Coordinate{
+			(from.get_x() > to.get_x() ? from.get_x() : to.get_x()),
+			(from.get_y() > to.get_y() ? from.get_y() : to.get_y()),
+			0 * Length::METER} - minCoord) + robotBox};
+	return !map.hasObstacle(minCoord - (robotBox / 2), size);
 }
 
 bool PathFinder::overlaps(const Coordinate &c1, const Coordinate &c2) {
-	return std::fabs(c1.x - c2.x) < robotBox.x / 2 &&
-	       std::fabs(c1.y - c2.y) < robotBox.y / 2;
+	Translation diff = c1 - c2;
+	return (diff.get_x() < 0 * Length::METER ?
+	        0 * Length::METER - diff.get_x() :
+	        diff.get_x()
+	       ) < robotBox.get_x() / 2 &&
+	       (diff.get_y() < 0 * Length::METER ?
+	        0 * Length::METER - diff.get_y() :
+	        diff.get_y()
+	       ) < robotBox.get_y() / 2;
 }
 
 // define a constant as to speed the calculation up,
 // in this case 10 digits is "good enough"
 #define SQ_ROOT_2 1.414213562f
 
-float PathFinder::getHeuristic(const Coordinate &coord) {
+Length PathFinder::getHeuristic(Translation coord) {
 	// diagonal distance
-	float xDist = coord.x < 0 ? -coord.x : coord.x;
-	float yDist = coord.y < 0 ? -coord.y : coord.y;
-	float shortDist, longDist;
+	Length xDist = coord.get_x() < 0 * Length::METER ? 0 * Length::METER - coord.get_x() : coord.get_x();
+	Length yDist = coord.get_y() < 0 * Length::METER ? 0 * Length::METER - coord.get_y() : coord.get_y();
+	Length shortDist, longDist;
 	if (xDist < yDist) {
 		shortDist = xDist;
 		longDist = yDist;

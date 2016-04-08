@@ -40,9 +40,9 @@ void Map::printMap() {
 	}
 }
 
-bool Map::hasObstacle(float x, float y, float boxSizeX, float boxSizeY) {
-	for (int i1 = int(x); i1 <= int(x + boxSizeX); i1++) {
-		for (int i2 = int(y); i2 <= int(y + boxSizeY); i2++) {
+bool Map::hasObstacle(Coordinate coord, Translation size) {
+	for (int i1 = int(coord.get_x() / Length::METER); i1 <= int((coord.get_x() + size.get_x()) / Length::METER); i1++) {
+		for (int i2 = int(coord.get_y() / Length::METER); i2 <= int((coord.get_y() + size.get_y()) / Length::METER); i2++) {
 			if (i1 < 0 || i1 >= sizeX ||
 			    i2 < 0 || i2 >= sizeY ||
 			    map[i1][i2] == 1 || map[i1][i2] == 2) {
@@ -53,9 +53,9 @@ bool Map::hasObstacle(float x, float y, float boxSizeX, float boxSizeY) {
 	return false;
 }
 
-bool Map::hasPassable(float x, float y, float boxSizeX, float boxSizeY) {
-	for (int i1 = int(x); i1 < int(x + boxSizeX); i1++) {
-		for (int i2 = int(y); i2 < int(y + boxSizeY); i2++) {
+bool Map::hasPassable(Coordinate coord, Translation size) {
+	for (int i1 = int(coord.get_x() / Length::METER); i1 <= int((coord.get_x() + size.get_x()) / Length::METER); i1++) {
+		for (int i2 = int(coord.get_y() / Length::METER); i2 <= int((coord.get_y() + size.get_y()) / Length::METER); i2++) {
 			if (i1 < 0 && i1 >= sizeX &&
 			    i2 < 0 && i2 >= sizeY &&
 			    map[i1][i2] == 0) {
