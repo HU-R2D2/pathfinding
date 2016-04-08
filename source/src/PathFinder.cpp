@@ -72,9 +72,7 @@ std::vector<PathFinder::CoordNode> PathFinder::CoordNode::getAvailableNodes(
 					children.push_back(
 							CoordNode{pathFinder, childPos, startNodeCoord,
 							          g + PathFinder::getHeuristic(
-									          {x * Length::METER,
-									           y * Length::METER,
-									           0 * Length::METER}
+									          childPos - coord
 							          ), // distance from the search begin
 							          self});
 				}
@@ -115,11 +113,10 @@ bool PathFinder::overlaps(const Coordinate &c1, const Coordinate &c2) {
 // define a constant as to speed the calculation up,
 // in this case 10 digits is "good enough"
 #define SQ_ROOT_2 1.414213562f
-
 Length PathFinder::getHeuristic(Translation coord) {
 	// diagonal distance
-	Length xDist = coord.get_x() < 0 * Length::METER ? 0 * Length::METER - coord.get_x() : coord.get_x();
-	Length yDist = coord.get_y() < 0 * Length::METER ? 0 * Length::METER - coord.get_y() : coord.get_y();
+	Length xDist = (coord.get_x() < 0 * Length::METER) ? (0 * Length::METER - coord.get_x()) : coord.get_x();
+	Length yDist = (coord.get_y() < 0 * Length::METER) ? (0 * Length::METER - coord.get_y()) : coord.get_y();
 	Length shortDist, longDist;
 	if (xDist < yDist) {
 		shortDist = xDist;
@@ -128,7 +125,7 @@ Length PathFinder::getHeuristic(Translation coord) {
 		shortDist = yDist;
 		longDist = xDist;
 	}
-	return shortDist * SQ_ROOT_2 + (longDist - shortDist);
+	return (shortDist * SQ_ROOT_2) + (longDist - shortDist);
 }
 
 std::vector<PathFinder::CoordNode> PathFinder::getPath(

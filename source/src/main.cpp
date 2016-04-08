@@ -50,22 +50,22 @@ void printMapWithPath(std::ostream &out, Map &map,
 
 int main() {
 	// debugging code for visualisation of paths
-	int mapX = 50, mapY = 50, mapCount = 0;
+	int mapX = 300, mapY = 300, mapCount = 0;
 	bool done = false;
 	while (!done) {
 
-		Map map = {mapX, mapY, .4f};
+		Map map = {mapX, mapY, 0.3f};
 		PathFinder pathFinder = {map, 
 				{0.5 * Length::METER, 
 				0.5 * Length::METER,
 				0 * Length::METER}};
 		std::vector<Coordinate> path;
 		done = pathFinder.get_path_to_coordinate(
-				{5.0f * Length::METER, 
-				5.0f * Length::METER, 
+				{5.5f * Length::METER,
+				5.5f * Length::METER,
 				0.0f * Length::METER},
-		        {(mapX - 5.0f)* Length::METER, 
-				(mapY - 5.0f) * Length::METER, 
+		        {(mapX - 5.5f)* Length::METER,
+				(mapY - 5.5f) * Length::METER,
 				0.0f * Length::METER},
 		        path);
 		mapCount++;
