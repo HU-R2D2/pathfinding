@@ -1,11 +1,14 @@
-////
-// Roborescue
+////                                                                                                                                        
+// \project Roborescue
+// \package Pathfinding
+// 
+// \file PathFinder.hpp
+// \date Created: 01-04-2016
+// \version 0.1.0
 //
-// \file Dummy.hpp
-// \date Created: 30-3-16
-// \version <0.0.0>
-//
-// \author Jasper Schoenmaker, Chiel Douwes, Ole Achterberg
+// \author Jasper Schoenmaker 1661818
+// \author Chiel Douwens 1666311
+// \author Ole Achterberg 1651981 
 //
 // \section LICENSE
 // License: newBSD

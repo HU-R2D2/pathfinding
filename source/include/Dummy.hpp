@@ -1,11 +1,13 @@
-////
-// Roborescue
-//
+////                                                                                                                                        
+// \project Roborescue
+// \package Pathfinding
+// 
 // \file Dummy.hpp
-// \date Created: 30-3-16
-// \version <0.0.0>
+// \date Created: 05-04-2016
+// \version 0.1.0
 //
-// \author Jasper Schoenmaker, Chiel Douwes
+// \author Jasper Schoenmaker 1661818
+// \author Chiel Douwens 1666311
 //
 // \section LICENSE
 // License: newBSD
@@ -29,7 +31,6 @@
 // LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ////
-
 #ifndef R2D2_PATHFINDING_DUMMY_HPP
 #define R2D2_PATHFINDING_DUMMY_HPP
 
