@@ -39,8 +39,8 @@
 
 #include <vector>
 #include <cmath>
-#include "Dummy.hpp"
-#include "Astar.hpp"
+#include "../include/Dummy.hpp"
+#include "../include/Astar.hpp"
 #include "../../../deps/adt/source/include/Coordinate.hpp"
 #include "../../../deps/adt/source/include/Length.hpp"
 #include "../../../deps/adt/source/include/Translation.hpp"
