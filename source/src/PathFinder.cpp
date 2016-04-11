@@ -35,12 +35,12 @@
 
 #include "../include/PathFinder.hpp"
 
-PathFinder::PathFinder(Map &map, Translation robotBox):
+PathFinder::PathFinder(Map &map, r2d2::Translation robotBox):
 		map(map),
 		robotBox(robotBox) {
 }
 
-bool PathFinder::get_path_to_coordinate(Coordinate start, Coordinate goal, std::vector<Coordinate> &path) {
+bool PathFinder::get_path_to_coordinate(r2d2::Coordinate start, r2d2::Coordinate goal, std::vector<r2d2::Coordinate> &path) {
 	// check for the goal node being at the same coordinate as the start node
 	if (overlaps(start, goal)) {
 		path.clear();
@@ -52,7 +52,7 @@ bool PathFinder::get_path_to_coordinate(Coordinate start, Coordinate goal, std::
 	}
 
 	// parent is at this point unknown for the start node, so construct it as unknown
-	CoordNode endNode{*this, goal, start, 0 * Length::METER}, startNode{*this, start, start};
+	CoordNode endNode{*this, goal, start, 0 * r2d2::Length::METER}, startNode{*this, start, start};
 	AStarSearch<CoordNode> search{endNode};
 
 	std::shared_ptr<CoordNode> foundStart = search.search(startNode);
@@ -70,8 +70,8 @@ bool PathFinder::get_path_to_coordinate(Coordinate start, Coordinate goal, std::
 }
 
 PathFinder::CoordNode::CoordNode(
-		PathFinder &pathFinder, Coordinate coord,
-		Coordinate &startCoord, Length g, std::weak_ptr<CoordNode> parent) :
+		PathFinder &pathFinder, r2d2::Coordinate coord,
+		r2d2::Coordinate &startCoord, r2d2::Length g, std::weak_ptr<CoordNode> parent) :
 		Node{g, PathFinder::get_heuristic(startCoord - coord),
 		     parent},
 		pathFinder(pathFinder),
@@ -87,11 +87,11 @@ std::vector<PathFinder::CoordNode> PathFinder::CoordNode::get_available_nodes(
 		for (int y = -1; y <= 1; y++) {
 			if (x != 0 || y != 0) {
 				// the grid will be relative to the end position of the search
-				Coordinate childPos{
-						coord + (Translation{
+				r2d2::Coordinate childPos{
+						coord + (r2d2::Translation{
 								x * pathFinder.robotBox.get_x(),
 						        y * pathFinder.robotBox.get_y(),
-						        0 * Length::METER
+						        0 * r2d2::Length::METER
 						} / SQUARES_PER_ROBOT)};
 				//check whether the successor is the end node
 				if (pathFinder.overlaps(childPos, startNodeCoord)) {
@@ -114,29 +114,29 @@ std::vector<PathFinder::CoordNode> PathFinder::CoordNode::get_available_nodes(
 }
 
 bool PathFinder::CoordNode::operator==(const PathFinder::CoordNode &lhs) const {
-	return (coord - lhs.coord).get_length() / Length::METER == 0;
+	return (coord - lhs.coord).get_length() / r2d2::Length::METER == 0;
 }
 
-bool PathFinder::can_travel(const Coordinate &from, const Coordinate &to) {
-	Coordinate minCoord{
+bool PathFinder::can_travel(const r2d2::Coordinate &from, const r2d2::Coordinate &to) {
+	r2d2::Coordinate minCoord{
 			(from.get_x() < to.get_x() ? from.get_x() : to.get_x()),
 			(from.get_y() < to.get_y() ? from.get_y() : to.get_y()),
-			0 * Length::METER};
-	Translation size{(Coordinate{
+			0 * r2d2::Length::METER};
+	r2d2::Translation size{(r2d2::Coordinate{
 			(from.get_x() > to.get_x() ? from.get_x() : to.get_x()),
 			(from.get_y() > to.get_y() ? from.get_y() : to.get_y()),
-			0 * Length::METER} - minCoord) + robotBox};
+			0 * r2d2::Length::METER} - minCoord) + robotBox};
 	return !map.has_obstacle(minCoord - (robotBox / 2), size);
 }
 
-bool PathFinder::overlaps(const Coordinate &c1, const Coordinate &c2) {
-	Translation diff = c1 - c2;
-	return (diff.get_x() < 0 * Length::METER ?
-	        0 * Length::METER - diff.get_x() :
+bool PathFinder::overlaps(const r2d2::Coordinate &c1, const r2d2::Coordinate &c2) {
+	r2d2::Translation diff = c1 - c2;
+	return (diff.get_x() < 0 * r2d2::Length::METER ?
+	        0 * r2d2::Length::METER - diff.get_x() :
 	        diff.get_x()
 	       ) < robotBox.get_x() / 2 &&
-	       (diff.get_y() < 0 * Length::METER ?
-	        0 * Length::METER - diff.get_y() :
+	       (diff.get_y() < 0 * r2d2::Length::METER ?
+	        0 * r2d2::Length::METER - diff.get_y() :
 	        diff.get_y()
 	       ) < robotBox.get_y() / 2;
 }
@@ -144,11 +144,11 @@ bool PathFinder::overlaps(const Coordinate &c1, const Coordinate &c2) {
 // define a constant as to speed the calculation up,
 // in this case 10 digits is "good enough"
 #define SQ_ROOT_2 1.414213562f
-Length PathFinder::get_heuristic(Translation coord) {
+r2d2::Length PathFinder::get_heuristic(r2d2::Translation coord) {
 	// diagonal distance
-	Length xDist = (coord.get_x() < 0 * Length::METER) ? (0 * Length::METER - coord.get_x()) : coord.get_x();
-	Length yDist = (coord.get_y() < 0 * Length::METER) ? (0 * Length::METER - coord.get_y()) : coord.get_y();
-	Length shortDist, longDist;
+	r2d2::Length xDist = (coord.get_x() < 0 * r2d2::Length::METER) ? (0 * r2d2::Length::METER - coord.get_x()) : coord.get_x();
+	r2d2::Length yDist = (coord.get_y() < 0 * r2d2::Length::METER) ? (0 * r2d2::Length::METER - coord.get_y()) : coord.get_y();
+	r2d2::Length shortDist, longDist;
 	if (xDist < yDist) {
 		shortDist = xDist;
 		longDist = yDist;
@@ -170,8 +170,8 @@ std::vector<PathFinder::CoordNode> PathFinder::get_path(
 	return path;
 }
 
-void PathFinder::smooth_path(std::vector<Coordinate> &path, Coordinate start) {
-	Coordinate lastPos = start;
+void PathFinder::smooth_path(std::vector<r2d2::Coordinate> &path, r2d2::Coordinate start) {
+	r2d2::Coordinate lastPos = start;
 	auto it = path.begin();
 	auto current = it++;
 	while (it != path.end()) {

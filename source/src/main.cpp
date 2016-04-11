@@ -64,7 +64,7 @@ public:
 	 * /param map Reference to the world map
 	 * /param robotSize Reference to the robot size
 	 */
-	PathFinder(Map &map, Translation robotBox);
+	PathFinder(Map &map, r2d2::Translation robotBox);
 
 	/**
 	 * Returns a path between two points
@@ -78,18 +78,18 @@ public:
 	 * /return If it was able to find a path
 	 */
 	virtual bool get_path_to_coordinate(
-			Coordinate start,
-			Coordinate goal,
-			std::vector<Coordinate> &path);
+			r2d2::Coordinate start,
+			r2d2::Coordinate goal,
+			std::vector<r2d2::Coordinate> &path);
 
 	/**
 	 * implementation of the astar node from Astar.hpp
 	 */
 	class CoordNode : public Node<CoordNode> {
 	public:
-		CoordNode(PathFinder &pathFinder, Coordinate coord,
-		          Coordinate &startCoord,
-		          Length g = Length::METER * std::numeric_limits<double>::infinity(),
+		CoordNode(PathFinder &pathFinder, r2d2::Coordinate coord,
+		          r2d2::Coordinate &startCoord,
+		          r2d2::Length g = r2d2::Length::METER * std::numeric_limits<double>::infinity(),
 		          std::weak_ptr<CoordNode> parent = {});
 
 		virtual bool operator==(const CoordNode &lhs) const override;
@@ -98,7 +98,7 @@ public:
 				std::shared_ptr<CoordNode> &self) override;
 
 		PathFinder &pathFinder;
-		Coordinate coord, &startNodeCoord;
+		r2d2::Coordinate coord, &startNodeCoord;
 
 		friend std::ostream &operator<<(std::ostream &lhs,
 		                                const CoordNode &rhs) {
@@ -109,7 +109,7 @@ public:
 
 private:
 	Map &map;
-	Translation robotBox;
+	r2d2::Translation robotBox;
 
 	/**
 	 * test whether it is possible to travel from "from" directly to "to"
@@ -122,7 +122,7 @@ private:
 	 * @return true if it is guaranteed that the robot can travel from "from" to
 	 *         "to"
 	 */
-	bool can_travel(const Coordinate &from, const Coordinate &to);
+	bool can_travel(const r2d2::Coordinate &from, const r2d2::Coordinate &to);
 
 	/**
 	 * check whether a coordinate will be overlapped by the robot when
@@ -135,7 +135,7 @@ private:
 	 *           robot
 	 * @return c1 overlaps c2 within the size of the robot
 	 */
-	bool overlaps(const Coordinate &c1, const Coordinate &c2);
+	bool overlaps(const r2d2::Coordinate &c1, const r2d2::Coordinate &c2);
 
 	/**
 	 * get the traversed distance if the robot goes from {0, 0} to "coord"
@@ -143,20 +143,20 @@ private:
 	 * @param coord the coordinate that should be calculated the length for
 	 * @return the distance from orgin to "coord"
 	 */
-	static Length get_heuristic(Translation coord);
+	static r2d2::Length get_heuristic(r2d2::Translation coord);
 
 	std::vector<CoordNode> get_path(std::shared_ptr<CoordNode> start);
 
-	void smooth_path(std::vector<Coordinate> &path, Coordinate start);
+	void smooth_path(std::vector<r2d2::Coordinate> &path, r2d2::Coordinate start);
 };
 
 namespace std {
 
 	template<>
-	struct hash<Coordinate> {
-		std::size_t operator()(const Coordinate &coord) const {
-			return std::hash<double>()(coord.get_x() / Length::METER)
-			       ^ (std::hash<double>()(coord.get_y() / Length::METER) << (sizeof(double) / 2));
+	struct hash<r2d2::Coordinate> {
+		std::size_t operator()(const r2d2::Coordinate &coord) const {
+			return std::hash<double>()(coord.get_x() / r2d2::Length::METER)
+			       ^ (std::hash<double>()(coord.get_y() / r2d2::Length::METER) << (sizeof(double) / 2));
 		}
 	};
 
@@ -166,7 +166,7 @@ namespace std {
 	template<>
 	struct hash<PathFinder::CoordNode> {
 		std::size_t operator()(const PathFinder::CoordNode& node) const {
-			return std::hash<Coordinate>()(node.coord);
+			return std::hash<r2d2::Coordinate>()(node.coord);
 		}
 	};
 
@@ -233,25 +233,25 @@ int main() {
 
 		Map map = {mapX, mapY, 0.3f};
 		PathFinder pathFinder = {map, 
-				{0.5 * Length::METER, 
-				0.5 * Length::METER,
-				0 * Length::METER}};
-		std::vector<Coordinate> path;
+				{0.5 * r2d2::Length::METER, 
+				0.5 * r2d2::Length::METER,
+				0 * r2d2::Length::METER}};
+		std::vector<r2d2::Coordinate> path;
 		done = pathFinder.get_path_to_coordinate(
-				{5.5f * Length::METER,
-				5.5f * Length::METER,
-				0.0f * Length::METER},
-		        {(mapX - 5.5f)* Length::METER,
-				(mapY - 5.5f) * Length::METER,
-				0.0f * Length::METER},
+				{5.5f * r2d2::Length::METER,
+				5.5f * r2d2::Length::METER,
+				0.0f * r2d2::Length::METER},
+		        {(mapX - 5.5f)* r2d2::Length::METER,
+				(mapY - 5.5f) * r2d2::Length::METER,
+				0.0f * r2d2::Length::METER},
 		        path);
 		mapCount++;
 
 		if (done) {
 			std::unordered_set<IntCoord> intPath;
-			for (Coordinate &coord : path) {
+			for (r2d2::Coordinate &coord : path) {
 				std::cout << coord << std::endl;
-				intPath.emplace(coord.get_x() / Length::METER * SCALE, coord.get_y() / Length::METER * SCALE);
+				intPath.emplace(coord.get_x() / r2d2::Length::METER * SCALE, coord.get_y() / r2d2::Length::METER * SCALE);
 			}
 			std::cout.flush();
 
