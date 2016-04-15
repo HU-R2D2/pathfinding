@@ -102,7 +102,8 @@ public:
     public:
         CoordNode(PathFinder &pathFinder, r2d2::Coordinate coord,
                   r2d2::Coordinate &startCoord,
-                  r2d2::Length g = r2d2::Length::METER * std::numeric_limits<double>::infinity(),
+                  r2d2::Length g = 
+                  r2d2::Length::METER * std::numeric_limits<double>::infinity(),
                   std::weak_ptr<CoordNode> parent = {});
 
         virtual bool operator==(const CoordNode &lhs) const override;
@@ -160,7 +161,8 @@ private:
 
     std::vector<CoordNode> get_path(std::shared_ptr<CoordNode> start);
 
-    void smooth_path(std::vector<r2d2::Coordinate> &path, r2d2::Coordinate start);
+    void smooth_path(std::vector<r2d2::Coordinate> &path, 
+                     r2d2::Coordinate start);
 };
 
 namespace std {
@@ -169,7 +171,8 @@ namespace std {
     struct hash<r2d2::Coordinate> {
         std::size_t operator()(const r2d2::Coordinate &coord) const {
             return std::hash<double>()(coord.get_x() / r2d2::Length::METER)
-                   ^ (std::hash<double>()(coord.get_y() / r2d2::Length::METER) << (sizeof(double) / 2));
+                   ^ (std::hash<double>()(coord.get_y() / r2d2::Length::METER) 
+                   << (sizeof(double) / 2));
         }
     };
 
@@ -264,7 +267,8 @@ int main() {
             std::unordered_set<IntCoord> intPath;
             for (r2d2::Coordinate &coord : path) {
                 std::cout << coord << std::endl;
-                intPath.emplace(coord.get_x() / r2d2::Length::METER * SCALE, coord.get_y() / r2d2::Length::METER * SCALE);
+                intPath.emplace(coord.get_x() / r2d2::Length::METER * SCALE, 
+                coord.get_y() / r2d2::Length::METER * SCALE);
             }
             std::cout.flush();
 

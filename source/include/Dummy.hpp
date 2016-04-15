@@ -62,7 +62,7 @@
 */
 class Map {
 public:
-    //! Implementation of the map, where: 0 = clear, 1 = obstacle, 2 = unexplored
+    //! Implementation of the map,where: 0 = clear, 1 = obstacle, 2 = unexplored
     std::vector<std::vector<int>> map;
 
     //! The sizes of the map

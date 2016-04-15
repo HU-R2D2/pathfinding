@@ -85,8 +85,12 @@ void Map::print_map() {
 }
 
 bool Map::has_obstacle(r2d2::Coordinate coord, r2d2::Translation size) {
-    for (int i1 = int(coord.get_x() / r2d2::Length::METER); i1 <= int((coord.get_x() + size.get_x()) / r2d2::Length::METER); i1++) {
-        for (int i2 = int(coord.get_y() / r2d2::Length::METER); i2 <= int((coord.get_y() + size.get_y()) / r2d2::Length::METER); i2++) {
+    for (int i1 = int(coord.get_x() / r2d2::Length::METER); 
+         i1 <= int((coord.get_x() + size.get_x()) / r2d2::Length::METER); 
+         i1++) {
+        for (int i2 = int(coord.get_y() / r2d2::Length::METER); 
+             i2 <= int((coord.get_y() + size.get_y()) / r2d2::Length::METER); 
+             i2++) {
             if (i1 < 0 || i1 >= sizeX ||
                 i2 < 0 || i2 >= sizeY ||
                 map[i1][i2] == 1 || map[i1][i2] == 2) {
@@ -98,8 +102,12 @@ bool Map::has_obstacle(r2d2::Coordinate coord, r2d2::Translation size) {
 }
 
 bool Map::has_passable(r2d2::Coordinate coord, r2d2::Translation size) {
-    for (int i1 = int(coord.get_x() / r2d2::Length::METER); i1 <= int((coord.get_x() + size.get_x()) / r2d2::Length::METER); i1++) {
-        for (int i2 = int(coord.get_y() / r2d2::Length::METER); i2 <= int((coord.get_y() + size.get_y()) / r2d2::Length::METER); i2++) {
+    for (int i1 = int(coord.get_x() / r2d2::Length::METER); 
+         i1 <= int((coord.get_x() + size.get_x()) / r2d2::Length::METER); 
+         i1++) {
+        for (int i2 = int(coord.get_y() / r2d2::Length::METER); 
+             i2 <= int((coord.get_y() + size.get_y()) / r2d2::Length::METER); 
+             i2++) {
             if (i1 < 0 && i1 >= sizeX &&
                 i2 < 0 && i2 >= sizeY &&
                 map[i1][i2] == 0) {

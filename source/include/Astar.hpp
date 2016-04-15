@@ -68,7 +68,8 @@ public:
     /**
      * creates a new node with predefined values as the variables
      */
-    Node(r2d2::Length g = r2d2::Length::METER * 0, r2d2::Length h = r2d2::Length::METER * 0,
+    Node(r2d2::Length g = r2d2::Length::METER * 0, 
+         r2d2::Length h = r2d2::Length::METER * 0,
          std::weak_ptr<T> parent = std::weak_ptr<T>()):
             g{ g },
             h{ h },
