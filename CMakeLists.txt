@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.9)
 project(R2D2_pathfinding)
 find_package (Threads)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -Wall -Werror")
 
 file(GLOB SOURCES "source/src/*.cpp" "source/include/*.hpp"
 		"../adt/source/src/*.cpp" "../adt/source/include/*.hpp")
