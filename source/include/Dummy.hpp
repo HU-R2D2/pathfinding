@@ -47,54 +47,54 @@
 */
 class Map {
 public:
-	//! Implementation of the map, where: 0 = clear, 1 = obstacle, 2 = unexplored
-	std::vector<std::vector<int>> map;
+    //! Implementation of the map, where: 0 = clear, 1 = obstacle, 2 = unexplored
+    std::vector<std::vector<int>> map;
 
-	//! The sizes of the map
-	int sizeX, sizeY;
+    //! The sizes of the map
+    int sizeX, sizeY;
 
-	//! Constructor
-	/*!
-	* /param x The width of the map
-	* /param y The height of the map
-	* /param obstacles Percentage of obstacles in the map
-	*/
-	Map(int x = 100, int y = 100, float obstacles = 0.25f);
+    //! Constructor
+    /*!
+    * \param x The width of the map
+    * \param y The height of the map
+    * \param obstacles Percentage of obstacles in the map
+    */
+    Map(int x = 100, int y = 100, float obstacles = 0.25f);
 
-	//! Constructor
-	/*!
-	* /param map The map
-	*/
-	Map(std::vector < std::vector<int> > map);
+    //! Constructor
+    /*!
+    * \param map The map
+    */
+    Map(std::vector < std::vector<int> > map);
 
-	//! Print the map
-	/*!
-	* /return void
-	*/
-	void print_map();
+    //! Print the map
+    /*!
+    * \return void
+    */
+    void print_map();
 
-	//! Returns if position on the map has a obstacle within the robot size
-	/*!
-	* /param x The x position on the map
-	* /param y The y position on the map
-	* /param sizeX The width of the robot
-	* /param sizeY The height of the robot
-	* /return If there is a obstacle found
-	*/
-	bool has_obstacle(r2d2::Coordinate coord, r2d2::Translation size);
+    //! Returns if position on the map has a obstacle within the robot size
+    /*!
+    * \param x The x position on the map
+    * \param y The y position on the map
+    * \param sizeX The width of the robot
+    * \param sizeY The height of the robot
+    * \return If there is a obstacle found
+    */
+    bool has_obstacle(r2d2::Coordinate coord, r2d2::Translation size);
 
-	//! Returns if position on the map has a passable erea within the robot size
-	/*!
-	* /param x The x position on the map
-	* /param y The y position on the map
-	* /param sizeX The width of the robot
-	* /param sizeY The height of the robot
-	* /return If there is a passable erea
-	*/
-	bool has_passable(r2d2::Coordinate coord, r2d2::Translation size);
+    //! Returns if position on the map has a passable erea within the robot size
+    /*!
+    * \param x The x position on the map
+    * \param y The y position on the map
+    * \param sizeX The width of the robot
+    * \param sizeY The height of the robot
+    * \return If there is a passable erea
+    */
+    bool has_passable(r2d2::Coordinate coord, r2d2::Translation size);
 
 private:
-	static std::mt19937_64 mersenne;
+    static std::mt19937_64 mersenne;
 
 };
 

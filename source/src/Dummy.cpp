@@ -37,61 +37,61 @@
 std::mt19937_64 Map::mersenne = std::mt19937_64{(unsigned long) (time(0))};
 
 Map::Map(int x, int y, float obstacles) :
-		map{}
+        map{}
 //		mersenne{(unsigned long) (time(0))}
 {
-	map.reserve((unsigned long) (x));
-	sizeX = x, sizeY = y;
-	for (int i1 = 0; i1 < x; i1++) {
-		map.emplace_back();
-		map[i1].reserve((unsigned long)(y));
-		for (int i2 = 0; i2 < y; i2++) {
-			map[i1].emplace_back();
-			map[i1][i2] = std::uniform_real_distribution<float>{}(mersenne)
-			              < obstacles ? 1 : 0;
-		}
-	}
+    map.reserve((unsigned long) (x));
+    sizeX = x, sizeY = y;
+    for (int i1 = 0; i1 < x; i1++) {
+        map.emplace_back();
+        map[i1].reserve((unsigned long)(y));
+        for (int i2 = 0; i2 < y; i2++) {
+            map[i1].emplace_back();
+            map[i1][i2] = std::uniform_real_distribution<float>{}(mersenne)
+                          < obstacles ? 1 : 0;
+        }
+    }
 }
 
 
 Map::Map(std::vector<std::vector<int>> map) :
-	map{ map },
-	sizeX{ int(map.size()) },
-	sizeY{ int(map[0].size()) }
+    map{ map },
+    sizeX{ int(map.size()) },
+    sizeY{ int(map[0].size()) }
 {
 }
 
 void Map::print_map() {
-	for (int i1 = 0; i1 < sizeX; i1++) {
-		for (int i2 = 0; i2 < sizeY; i2++) {
-			std::cout << map[i1][i2];
-		}
-		std::cout << std::endl;
-	}
+    for (int i1 = 0; i1 < sizeX; i1++) {
+        for (int i2 = 0; i2 < sizeY; i2++) {
+            std::cout << map[i1][i2];
+        }
+        std::cout << std::endl;
+    }
 }
 
 bool Map::has_obstacle(r2d2::Coordinate coord, r2d2::Translation size) {
-	for (int i1 = int(coord.get_x() / r2d2::Length::METER); i1 <= int((coord.get_x() + size.get_x()) / r2d2::Length::METER); i1++) {
-		for (int i2 = int(coord.get_y() / r2d2::Length::METER); i2 <= int((coord.get_y() + size.get_y()) / r2d2::Length::METER); i2++) {
-			if (i1 < 0 || i1 >= sizeX ||
-			    i2 < 0 || i2 >= sizeY ||
-			    map[i1][i2] == 1 || map[i1][i2] == 2) {
-				return true;
-			}
-		}
-	}
-	return false;
+    for (int i1 = int(coord.get_x() / r2d2::Length::METER); i1 <= int((coord.get_x() + size.get_x()) / r2d2::Length::METER); i1++) {
+        for (int i2 = int(coord.get_y() / r2d2::Length::METER); i2 <= int((coord.get_y() + size.get_y()) / r2d2::Length::METER); i2++) {
+            if (i1 < 0 || i1 >= sizeX ||
+                i2 < 0 || i2 >= sizeY ||
+                map[i1][i2] == 1 || map[i1][i2] == 2) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 bool Map::has_passable(r2d2::Coordinate coord, r2d2::Translation size) {
-	for (int i1 = int(coord.get_x() / r2d2::Length::METER); i1 <= int((coord.get_x() + size.get_x()) / r2d2::Length::METER); i1++) {
-		for (int i2 = int(coord.get_y() / r2d2::Length::METER); i2 <= int((coord.get_y() + size.get_y()) / r2d2::Length::METER); i2++) {
-			if (i1 < 0 && i1 >= sizeX &&
-			    i2 < 0 && i2 >= sizeY &&
-			    map[i1][i2] == 0) {
-				return true;
-			}
-		}
-	}
-	return false;
+    for (int i1 = int(coord.get_x() / r2d2::Length::METER); i1 <= int((coord.get_x() + size.get_x()) / r2d2::Length::METER); i1++) {
+        for (int i2 = int(coord.get_y() / r2d2::Length::METER); i2 <= int((coord.get_y() + size.get_y()) / r2d2::Length::METER); i2++) {
+            if (i1 < 0 && i1 >= sizeX &&
+                i2 < 0 && i2 >= sizeY &&
+                map[i1][i2] == 0) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
