@@ -13,6 +13,8 @@
 //! \brief  main used for testing
 //!
 //! Main used for testing
+//! This file will not be used for actual production code,
+//! and is only for debugging purposes
 //!
 //! \copyright Copyright © 2016, HU University of Applied Sciences Utrecht.
 //! All rights reserved.
@@ -75,19 +77,25 @@ namespace std {
         }
     };
 }
-// prints out a .pgm (portable grey r2d2::Map) image of the r2d2::Map and it's path
+
+// the pgm printer prints out a multiple of pixels for each tile in the tile
+// map, this definition controls how much pixels are printed per tile
 #define SCALE 4
 
+// prints out a .pgm (portable grey map)
+// image of the map and a calculated path overlaid onto it
+// if you want to know how or why this code works
+// you should search the pnm format
 void printMapWithPath(std::ostream &out, r2d2::Map &map,
                       std::unordered_set<IntCoord> path) {
     out << "P3" << std::endl;
     out << map.sizeX * SCALE << " " << map.sizeY * SCALE << " 2" << std::endl;
     for (int i1 = 0; i1 < map.sizeY * SCALE; i1++) {
         for (int i2 = 0; i2 < map.sizeX * SCALE; i2++) {
-            int groundVal = 1 - map.map[i1 / SCALE][i2 / SCALE];
             if (path.find(IntCoord(i1, i2)) != path.end()) {
-                out << "2 " << 0 << " " << 0 << " ";
+                out << "2 0 0 ";
             } else {
+                int groundVal = 1 - map.map[i1 / SCALE][i2 / SCALE];
                 out << groundVal * 2 << " " << groundVal * 2 << " " <<
                 groundVal * 2 << " ";
             }

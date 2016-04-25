@@ -136,10 +136,13 @@ namespace r2d2 {
          *         otherwise return nullptr
          */
         std::shared_ptr<T> search(T &start) {
+            // the amount of nodes left to search before the search is abandoned
             int giveUpCount = MAX_SEARCH_NODES;
 
             while (!open.empty() && --giveUpCount >= 0) {
                 std::shared_ptr<T> curOpen{open[0]};
+                // use the heap methods from std,
+                // as this is a very performat use case
                 std::pop_heap(open.begin(), open.end(),
                               [](std::shared_ptr<T> &n1,
                                  std::shared_ptr<T> &n2) {
@@ -147,11 +150,16 @@ namespace r2d2 {
                               });
                 open.pop_back();
 
+                // query the current node for the nodes
+                // that are accessible from that node
                 for (T &c : curOpen->get_available_nodes(curOpen)) {
                     std::shared_ptr<T> child{std::make_shared<T>(c)};
 
+                    // add the child to the closed set
                     auto result = closed.emplace(child);
                     if (result.second) {
+                        // if the node did not yet exist in the set
+                        // push the heap with the new open node
                         open.emplace_back(*result.first);
                         std::push_heap(
                                 open.begin(), open.end(),
@@ -161,6 +169,8 @@ namespace r2d2 {
                                 });
                     }
                     if (*child == start) {
+                        // the opened child was the node the search
+                        // was supposed to reach; terminate the search
                         return *closed.find(child);
                     }
                 }

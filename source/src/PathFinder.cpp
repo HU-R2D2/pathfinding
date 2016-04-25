@@ -194,7 +194,7 @@ namespace r2d2 {
             std::shared_ptr<PathFinder::CoordNode> start) {
         std::shared_ptr<CoordNode> curNode = start;
         std::vector<CoordNode> path;
-        while (!curNode->parent.expired()) {
+        while (!curNode->parent.expired()) { // while next != nullptr
             curNode = std::shared_ptr<CoordNode>(curNode->parent);
             path.emplace_back(*curNode);
         }
@@ -207,9 +207,12 @@ namespace r2d2 {
         auto it = path.begin();
         auto current = it++;
         while (it != path.end()) {
+            // check if the is a path from the current anchor node to the next
             if (can_travel(lastPos, *it)) {
+                // if so, remove the node(s) in between
                 path.erase(current);
             } else {
+                // if not, make the current node the new anchor node
                 lastPos = *it;
                 current = it++;
             }

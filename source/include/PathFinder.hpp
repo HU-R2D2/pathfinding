@@ -96,6 +96,8 @@ namespace r2d2 {
                 Coordinate goal,
                 std::vector<Coordinate> &path);
 
+    private:
+
         /**
          * implementation of the astar node from Astar.hpp
          */
@@ -122,7 +124,8 @@ namespace r2d2 {
             }
         };
 
-    private:
+        friend struct std::hash<CoordNode>;
+
         Map &map;
         Translation robotBox;
 
@@ -161,8 +164,20 @@ namespace r2d2 {
          */
         static Length get_heuristic(Translation coord);
 
+        /**
+         * extracts a path from a pathfinder search field
+         *
+         * \param start the node to start the search from
+         * \return the computed path from the supplied node to the goal node
+         */
         std::vector<CoordNode> get_path(std::shared_ptr<CoordNode> start);
 
+        /**
+         * strips a path of all unneccecary nodes, smoothing the pathe in the process
+         *
+         * \param path the path to smooth
+         * \param start the original start coordinate
+         */
         void smooth_path(std::vector<Coordinate> &path, Coordinate start);
     };
 
