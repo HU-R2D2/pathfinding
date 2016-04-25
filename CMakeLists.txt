@@ -5,10 +5,14 @@ find_package (Threads)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -Wall -Werror")
 
 file(GLOB SOURCES "source/src/*.cpp" "source/include/*.hpp"
-		"../adt/source/src/*.cpp" "../adt/source/include/*.hpp")
+		"../adt/source/src/Coordinate.cpp" "../adt/source/include/Coordinate.hpp"
+		"../adt/source/src/Length.cpp" "../adt/source/include/Length.hpp"
+		"../adt/source/src/Translation.cpp" "../adt/source/include/Translation.hpp")
 file(GLOB SOURCES_GTEST "source/src/*.cpp" "source/include/*.hpp"
 		"test/*.cpp" "test/*.hpp"
-		"../adt/source/src/*.cpp" "../adt/source/include/*.hpp")
+		"../adt/source/src/Coordinate.cpp" "../adt/source/include/Coordinate.hpp"
+		"../adt/source/src/Length.cpp" "../adt/source/include/Length.hpp"
+		"../adt/source/src/Translation.cpp" "../adt/source/include/Translation.hpp")
 list(REMOVE_ITEM SOURCES_GTEST ${CMAKE_CURRENT_SOURCE_DIR}/source/src/main.cpp)
 list(REMOVE_ITEM SOURCES_GTEST ${CMAKE_CURRENT_SOURCE_DIR}../adt/source/src/main.cpp)
 
