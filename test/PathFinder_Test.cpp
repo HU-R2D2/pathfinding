@@ -51,7 +51,7 @@
 #include <thread>
 #include <fstream>
 #include "../source/include/Dummy.hpp"
-#include "../source/include/PathFinder.hpp"
+#include "../source/include/AStarPathFinder.hpp"
 
 bool equal(const std::vector<r2d2::Coordinate> &lhs,
            const std::vector<r2d2::Coordinate> &rhs) {
@@ -99,7 +99,7 @@ std::tuple<bool, r2d2::Map> test_until_true(int mapX, int mapY,
                                             std::vector<r2d2::Coordinate> &path) {
     for (int i = 0; i < MAX_TRIES; i++) {
         r2d2::Map map(mapX, mapY);
-        r2d2::PathFinder pf(map, robotBox);
+        r2d2::AStarPathFinder pf(map, robotBox);
 
         if (pf.get_path_to_coordinate(start, goal, path)) {
             return std::tuple<bool, r2d2::Map>{true, map};
@@ -112,7 +112,7 @@ TEST(PathFinder, constructor) {
     r2d2::Map map(50, 50, 0);
     r2d2::Translation robotBox{.5 * r2d2::Length::METER, .5 * r2d2::Length::METER,
                          0 * r2d2::Length::METER};
-    r2d2::PathFinder pf(map, robotBox);
+    r2d2::AStarPathFinder pf(map, robotBox);
 
     r2d2::Coordinate start{.5 * r2d2::Length::METER, .5 * r2d2::Length::METER, 0 * r2d2::Length::METER};
     r2d2::Coordinate goal{49.5 * r2d2::Length::METER, 49.5 * r2d2::Length::METER,
@@ -129,7 +129,7 @@ TEST(PathFinder, not_existing_begin) {
     r2d2::Translation robotBox{.5 * r2d2::Length::METER,
                                .5 * r2d2::Length::METER,
                                0 * r2d2::Length::METER};
-    r2d2::PathFinder pf(map, robotBox);
+    r2d2::AStarPathFinder pf(map, robotBox);
 
     r2d2::Coordinate start{-1 * r2d2::Length::METER, -1 * r2d2::Length::METER, 0 * r2d2::Length::METER};
     r2d2::Coordinate goal{49.5 * r2d2::Length::METER, 49.5 * r2d2::Length::METER,
@@ -145,7 +145,7 @@ TEST(PathFinder, not_existing_end) {
     r2d2::Translation robotBox{.5 * r2d2::Length::METER,
                                .5 * r2d2::Length::METER,
                                0 * r2d2::Length::METER};
-    r2d2::PathFinder pf(map, robotBox);
+    r2d2::AStarPathFinder pf(map, robotBox);
 
     r2d2::Coordinate start{.5 * r2d2::Length::METER,
                            .5 * r2d2::Length::METER,
@@ -164,7 +164,7 @@ TEST(PathFinder, without_obstacles) {
     r2d2::Translation robotBox{.5 * r2d2::Length::METER,
                                .5 * r2d2::Length::METER,
                                0 * r2d2::Length::METER};
-    r2d2::PathFinder pf(map, robotBox);
+    r2d2::AStarPathFinder pf(map, robotBox);
 
     r2d2::Coordinate start{.5 * r2d2::Length::METER, .5 * r2d2::Length::METER, 0 * r2d2::Length::METER};
     r2d2::Coordinate goal{49.5 * r2d2::Length::METER, 49.5 * r2d2::Length::METER,
@@ -205,7 +205,7 @@ TEST(PathFinder, consistent) {
     ASSERT_TRUE(std::get<0>(result)) << start << " " << goal << " first time";
     ASSERT_FALSE(path.empty()) << "path empty";
     std::vector<r2d2::Coordinate> currentpath = path;
-    r2d2::PathFinder p2{std::get<1>(result), robotBox};
+    r2d2::AStarPathFinder p2{std::get<1>(result), robotBox};
     ASSERT_TRUE(p2.get_path_to_coordinate(start, goal, path))
                                 << start << " " << goal << " second time";
     ASSERT_TRUE(equal(currentpath, path));
@@ -216,7 +216,7 @@ TEST(PathFinder, robot_size) {
     // size 0
     r2d2::Translation robotBox{0 * r2d2::Length::METER, 0 * r2d2::Length::METER,
                          0 * r2d2::Length::METER};
-    r2d2::PathFinder pf(map, robotBox);
+    r2d2::AStarPathFinder pf(map, robotBox);
 
     r2d2::Coordinate start{10.5 * r2d2::Length::METER,
                            10.5 * r2d2::Length::METER,
@@ -233,7 +233,7 @@ TEST(PathFinder, robot_size) {
     r2d2::Translation robotBox2{5 * r2d2::Length::METER,
                                 5 * r2d2::Length::METER,
                                 0 * r2d2::Length::METER};
-    r2d2::PathFinder pf1(map, robotBox2);
+    r2d2::AStarPathFinder pf1(map, robotBox2);
     ASSERT_TRUE(pf1.get_path_to_coordinate(start, goal, path))
                                 << start << " " << goal << " robot with size 5";
     ASSERT_FALSE(path.empty());
@@ -246,7 +246,7 @@ TEST(PathFinder, obstacle_on_begin) {
     r2d2::Translation robotBox{.5 * r2d2::Length::METER,
                                .5 * r2d2::Length::METER,
                                0 * r2d2::Length::METER};
-    r2d2::PathFinder pf(map, robotBox);
+    r2d2::AStarPathFinder pf(map, robotBox);
 
     r2d2::Coordinate start{.5 * r2d2::Length::METER,
                            .5 * r2d2::Length::METER,
@@ -267,7 +267,7 @@ TEST(PathFinder, obstacle_on_end) {
     r2d2::Translation robotBox{.5 * r2d2::Length::METER,
                                .5 * r2d2::Length::METER,
                                0 * r2d2::Length::METER};
-    r2d2::PathFinder pf(map, robotBox);
+    r2d2::AStarPathFinder pf(map, robotBox);
 
     r2d2::Coordinate start{.5 * r2d2::Length::METER,
                            .5 * r2d2::Length::METER,
@@ -286,7 +286,7 @@ TEST(PathFinder, float) {
     r2d2::Translation robotBox{.5 * r2d2::Length::METER,
                                .5 * r2d2::Length::METER,
                                0 * r2d2::Length::METER};
-    r2d2::PathFinder pf(map, robotBox);
+    r2d2::AStarPathFinder pf(map, robotBox);
     r2d2::Coordinate start{.56 * r2d2::Length::METER,
                            .52 * r2d2::Length::METER,
                            0 * r2d2::Length::METER};
@@ -304,7 +304,7 @@ TEST(PathFinder, same_begin_as_end) {
     r2d2::Translation robotBox{.5 * r2d2::Length::METER,
                                .5 * r2d2::Length::METER,
                                0 * r2d2::Length::METER};
-    r2d2::PathFinder pf(map, robotBox);
+    r2d2::AStarPathFinder pf(map, robotBox);
 
     r2d2::Coordinate start{1 * r2d2::Length::METER,
                            1 * r2d2::Length::METER,
@@ -335,7 +335,7 @@ TEST(PathFinder, corner_squeezing) {
     r2d2::Translation robotBox{.5 * r2d2::Length::METER,
                                .5 * r2d2::Length::METER,
                                0 * r2d2::Length::METER};
-    r2d2::PathFinder pf(map, robotBox);
+    r2d2::AStarPathFinder pf(map, robotBox);
 
     r2d2::Coordinate start{.5 * r2d2::Length::METER,
                            .5 * r2d2::Length::METER,
@@ -347,6 +347,94 @@ TEST(PathFinder, corner_squeezing) {
     ASSERT_FALSE(pf.get_path_to_coordinate(start, goal, path))
                                 << start << " " << goal;
     ASSERT_TRUE(path.empty());
+}
+
+// we need a specialized integer coordinate class
+// to be able to access the image coordinates
+struct IntCoord {
+public:
+    IntCoord() : x{0}, y{0} { }
+
+    IntCoord(int x, int y) : x{x}, y{y} { }
+
+    int x, y;
+
+    bool operator==(const IntCoord &lhs) const {
+        return x == lhs.x && y == lhs.y;
+    }
+};
+namespace std {
+    template<>
+    struct hash<IntCoord> {
+        std::size_t operator()(const IntCoord &coord) const {
+            return std::hash<int>()(coord.x)
+                   ^ (std::hash<int>()(coord.y) << (sizeof(int) / 2));
+        }
+    };
+}
+
+// the pgm printer prints out a multiple of pixels for each tile in the tile
+// map, this definition controls how much pixels are printed per tile
+#define SCALE 4
+
+// prints out a .pgm (portable grey map)
+// image of the map and a calculated path overlaid onto it
+// if you want to know how or why this code works
+// you should search the pnm format
+void printMapWithPath(std::ostream &out, r2d2::Map &map,
+                      std::unordered_set<IntCoord> path) {
+    out << "P3" << std::endl;
+    out << map.sizeX * SCALE << " " << map.sizeY * SCALE << " 2" << std::endl;
+    for (int i1 = 0; i1 < map.sizeY * SCALE; i1++) {
+        for (int i2 = 0; i2 < map.sizeX * SCALE; i2++) {
+            if (path.find(IntCoord(i1, i2)) != path.end()) {
+                out << "2 0 0 ";
+            } else {
+                int groundVal = 1 - map.map[i1 / SCALE][i2 / SCALE];
+                out << groundVal * 2 << " " << groundVal * 2 << " " <<
+                groundVal * 2 << " ";
+            }
+        }
+        out << std::endl;
+    }
+}
+
+TEST(PathFinder, image_test) {
+    // debugging code for visualisation of paths
+    int mapX = 100, mapY = 100, mapCount = 0;
+    bool done = false;
+    while (!done) {
+
+        r2d2::Map map = {mapX, mapY, 0.4f};
+        r2d2::AStarPathFinder pathFinder = {map,
+                                       {0.5 * r2d2::Length::METER,
+                                        0.5 * r2d2::Length::METER,
+                                        0 * r2d2::Length::METER}};
+        std::vector<r2d2::Coordinate> path;
+        done = pathFinder.get_path_to_coordinate(
+                {5.5f * r2d2::Length::METER,
+                 5.5f * r2d2::Length::METER,
+                 0.0f * r2d2::Length::METER},
+                {(mapX - 5.5f) * r2d2::Length::METER,
+                 (mapY - 5.5f) * r2d2::Length::METER,
+                 0.0f * r2d2::Length::METER},
+                path);
+        mapCount++;
+
+        if (done) {
+            std::unordered_set<IntCoord> intPath;
+            for (r2d2::Coordinate &coord : path) {
+                intPath.emplace(coord.get_x() / r2d2::Length::METER * SCALE,
+                                coord.get_y() / r2d2::Length::METER * SCALE);
+            }
+
+            std::ofstream ofs{"path.pgm"};
+            printMapWithPath(ofs, map, intPath);
+            ofs.flush();
+
+            std::cout << "searched " << mapCount << " maps" << std::endl;
+        }
+    }
 }
 
 int main(int argc, char **argv) {

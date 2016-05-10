@@ -4,7 +4,7 @@
 //! A pathfinding module that can be used in the R2D2 project.
 //! The module is currently based on the A star algorithm.
 //!
-//! \file   PathFinder.cpp
+//! \file   AStarPathFinder.cpp
 //! \author Jasper Schoenmaker 1661818
 //! \author Chiel Douwes 1666311
 //! \author Ole Achterberg 1651981
@@ -48,16 +48,17 @@
 //! EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ~< HEADER_VERSION 2016 04 12 >~
 
-#include "../include/PathFinder.hpp"
+#include "../include/AStarPathFinder.hpp"
 
 namespace r2d2 {
 
-    PathFinder::PathFinder(Map &map, Translation robotBox) :
+    AStarPathFinder::AStarPathFinder(Map &map, Translation robotBox) :
+            PathFinder{map, robotBox},
             map(map),
             robotBox(robotBox) {
     }
 
-    bool PathFinder::get_path_to_coordinate(Coordinate start,
+    bool AStarPathFinder::get_path_to_coordinate(Coordinate start,
                                             Coordinate goal,
                                             std::vector<Coordinate>
                                             &path) {
@@ -93,20 +94,20 @@ namespace r2d2 {
         }
     }
 
-    PathFinder::CoordNode::CoordNode(
-            PathFinder &pathFinder, Coordinate coord,
+    AStarPathFinder::CoordNode::CoordNode(
+            AStarPathFinder &pathFinder, Coordinate coord,
             Coordinate &startCoord, Length g,
             std::weak_ptr<CoordNode> parent) :
-            Node{g, PathFinder::get_heuristic(startCoord - coord),
+            Node{g, AStarPathFinder::get_heuristic(startCoord - coord),
                  parent},
             pathFinder(pathFinder),
             coord(coord),
             startNodeCoord(startCoord) {
     }
 
-    std::vector<PathFinder::CoordNode>
-    PathFinder::CoordNode::get_available_nodes(
-            std::shared_ptr<PathFinder::CoordNode> &self) {
+    std::vector<AStarPathFinder::CoordNode>
+    AStarPathFinder::CoordNode::get_available_nodes(
+            std::shared_ptr<AStarPathFinder::CoordNode> &self) {
         std::vector<CoordNode> children;
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
@@ -127,7 +128,7 @@ namespace r2d2 {
                     if (pathFinder.can_travel(coord, childPos)) {
                         children.push_back(
                                 CoordNode{pathFinder, childPos, startNodeCoord,
-                                          g + PathFinder::get_heuristic(
+                                          g + AStarPathFinder::get_heuristic(
                                                   childPos - coord
                                           ), // distance from the search begin
                                           self});
@@ -138,12 +139,12 @@ namespace r2d2 {
         return children;
     }
 
-    bool PathFinder::CoordNode::operator==(
-            const PathFinder::CoordNode &lhs) const {
+    bool AStarPathFinder::CoordNode::operator==(
+            const AStarPathFinder::CoordNode &lhs) const {
         return (coord - lhs.coord).get_length() / Length::METER == 0;
     }
 
-    bool PathFinder::can_travel(const Coordinate &from,
+    bool AStarPathFinder::can_travel(const Coordinate &from,
                                 const Coordinate &to) {
         Coordinate minCoord{
                 (from.get_x() < to.get_x() ? from.get_x() : to.get_x()),
@@ -156,7 +157,7 @@ namespace r2d2 {
         return !map.has_obstacle(minCoord - (robotBox / 2), size);
     }
 
-    bool PathFinder::overlaps(const Coordinate &c1,
+    bool AStarPathFinder::overlaps(const Coordinate &c1,
                               const Coordinate &c2) {
         Translation diff = c1 - c2;
         return (diff.get_x() < 0 * Length::METER ?
@@ -173,7 +174,7 @@ namespace r2d2 {
     // in this case 10 digits is "good enough"
 #define SQ_ROOT_2 1.414213562f
 
-    Length PathFinder::get_heuristic(Translation coord) {
+    Length AStarPathFinder::get_heuristic(Translation coord) {
         // diagonal distance
         Length xDist = (coord.get_x() < 0 * Length::METER) ?
                        (0 * Length::METER - coord.get_x()) : coord.get_x();
@@ -190,8 +191,8 @@ namespace r2d2 {
         return (shortDist * SQ_ROOT_2) + (longDist - shortDist);
     }
 
-    std::vector<PathFinder::CoordNode> PathFinder::get_path(
-            std::shared_ptr<PathFinder::CoordNode> start) {
+    std::vector<AStarPathFinder::CoordNode> AStarPathFinder::get_path(
+            std::shared_ptr<AStarPathFinder::CoordNode> start) {
         std::shared_ptr<CoordNode> curNode = start;
         std::vector<CoordNode> path;
         while (!curNode->parent.expired()) { // while next != nullptr
@@ -201,7 +202,7 @@ namespace r2d2 {
         return path;
     }
 
-    void PathFinder::smooth_path(std::vector<Coordinate> &path,
+    void AStarPathFinder::smooth_path(std::vector<Coordinate> &path,
                                  Coordinate start) {
         Coordinate lastPos = start;
         auto it = path.begin();
