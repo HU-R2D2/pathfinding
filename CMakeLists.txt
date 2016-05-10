@@ -8,7 +8,11 @@ file(GLOB SOURCES_GTEST "source/src/*.cpp" "source/include/*.hpp"
 		"test/*.cpp" "test/*.hpp"
 		"../adt/source/src/Coordinate.cpp" "../adt/source/include/Coordinate.hpp"
 		"../adt/source/src/Length.cpp" "../adt/source/include/Length.hpp"
-		"../adt/source/src/Translation.cpp" "../adt/source/include/Translation.hpp")
+		"../adt/source/src/Translation.cpp" "../adt/source/include/Translation.hpp"
+		"../adt/source/src/Box.cpp" "../adt/source/include/Box.hpp"
+		"../sharedobjects/source/include/SharedObject.hpp"
+		"../sharedobjects/source/include/LockingSharedObject.hpp"
+		"../sharedobjects/source/include/NotCopyable.hpp")
 list(REMOVE_ITEM SOURCES_GTEST ${CMAKE_CURRENT_SOURCE_DIR}../adt/source/src/main.cpp)
 
 include_directories(

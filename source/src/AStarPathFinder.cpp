@@ -52,10 +52,12 @@
 
 namespace r2d2 {
 
-    AStarPathFinder::AStarPathFinder(Map &map, Translation robotBox) :
+    AStarPathFinder::AStarPathFinder(SharedObject<Map> &map, Box robotBox) :
             PathFinder{map, robotBox},
             map(map),
-            robotBox(robotBox) {
+            mapAccessor{},
+            referenceCount{0},
+            robotBox{robotBox.get_axis_size()} {
     }
 
     bool AStarPathFinder::get_path_to_coordinate(Coordinate start,
@@ -67,6 +69,12 @@ namespace r2d2 {
             path.clear();
             return true;
         }
+
+        if (mapAccessor == nullptr) {
+            mapAccessor = std::unique_ptr<SharedObject<Map>::Accessor>{new SharedObject<Map>::Accessor{map}};
+        }
+        referenceCount++;
+
         // do a check for end node accessibility before starting the search
         if (!can_travel(goal, goal)) {
             return false;
@@ -75,23 +83,24 @@ namespace r2d2 {
         // parent is at this point unknown for the start node,
         // so construct it as unknown
         CoordNode endNode{*this, goal, start, 0 * Length::METER},
-                startNode{*this,
-                          start,
-                          start};
+                startNode{*this, start, start};
         AStarSearch<CoordNode> search{endNode};
 
         std::shared_ptr<CoordNode> foundStart = search.search(startNode);
-        if (foundStart == nullptr) {
-            return false;
-        } else {
+        if (foundStart != nullptr) {
             std::vector<CoordNode> foundPath{get_path(foundStart)};
             path.clear();
             for (CoordNode &node : foundPath) {
                 path.push_back(node.coord);
             }
+
             smooth_path(path, start);
-            return true;
         }
+
+        if (--referenceCount == 0) {
+            mapAccessor.release();
+        }
+        return foundStart != nullptr;
     }
 
     AStarPathFinder::CoordNode::CoordNode(
@@ -154,7 +163,7 @@ namespace r2d2 {
                 (from.get_x() > to.get_x() ? from.get_x() : to.get_x()),
                 (from.get_y() > to.get_y() ? from.get_y() : to.get_y()),
                 0 * Length::METER} - minCoord) + robotBox};
-        return !map.has_obstacle(minCoord - (robotBox / 2), size);
+        return !mapAccessor->access().has_obstacle(minCoord - (robotBox / 2), size);
     }
 
     bool AStarPathFinder::overlaps(const Coordinate &c1,

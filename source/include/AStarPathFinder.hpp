@@ -51,6 +51,7 @@
 #ifndef R2D2_PATHFINDING_ASTARPATHFINDER_HPP
 #define R2D2_PATHFINDING_ASTARPATHFINDER_HPP
 
+#include <atomic>
 #include "PathFinder.hpp"
 #include "Astar.hpp"
 
@@ -68,7 +69,7 @@ namespace r2d2 {
      */
     class AStarPathFinder : public PathFinder {
     public:
-        AStarPathFinder(Map &map, Translation robotBox);
+        AStarPathFinder(SharedObject<Map> &map, Box robotBox);
 
         virtual bool get_path_to_coordinate(
                 Coordinate start,
@@ -101,11 +102,13 @@ namespace r2d2 {
                 return lhs << "(" << rhs.coord << ", " << rhs.g
                        << ", " << rhs.h << ", " << rhs.f << ")";
             }
-        };
 
+        };
         friend struct std::hash<CoordNode>;
 
-        Map &map;
+        SharedObject<Map> &map;
+        std::unique_ptr<SharedObject<Map>::Accessor> mapAccessor;
+        std::atomic<int> referenceCount;
         Translation robotBox;
 
         /**

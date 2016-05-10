@@ -52,6 +52,7 @@
 #include <fstream>
 #include "../source/include/Dummy.hpp"
 #include "../source/include/AStarPathFinder.hpp"
+#include "../../sharedobjects/source/include/LockingSharedObject.hpp"
 
 bool equal(const std::vector<r2d2::Coordinate> &lhs,
            const std::vector<r2d2::Coordinate> &rhs) {
@@ -99,7 +100,8 @@ std::tuple<bool, r2d2::Map> test_until_true(int mapX, int mapY,
                                             std::vector<r2d2::Coordinate> &path) {
     for (int i = 0; i < MAX_TRIES; i++) {
         r2d2::Map map(mapX, mapY);
-        r2d2::AStarPathFinder pf(map, robotBox);
+        LockingSharedObject<r2d2::Map> sharedMap{map};
+        r2d2::AStarPathFinder pf{sharedMap, {{}, robotBox}};
 
         if (pf.get_path_to_coordinate(start, goal, path)) {
             return std::tuple<bool, r2d2::Map>{true, map};
@@ -112,7 +114,8 @@ TEST(PathFinder, constructor) {
     r2d2::Map map(50, 50, 0);
     r2d2::Translation robotBox{.5 * r2d2::Length::METER, .5 * r2d2::Length::METER,
                          0 * r2d2::Length::METER};
-    r2d2::AStarPathFinder pf(map, robotBox);
+    LockingSharedObject<r2d2::Map> sharedMap{map};
+    r2d2::AStarPathFinder pf(sharedMap, {{}, robotBox});
 
     r2d2::Coordinate start{.5 * r2d2::Length::METER, .5 * r2d2::Length::METER, 0 * r2d2::Length::METER};
     r2d2::Coordinate goal{49.5 * r2d2::Length::METER, 49.5 * r2d2::Length::METER,
@@ -129,7 +132,8 @@ TEST(PathFinder, not_existing_begin) {
     r2d2::Translation robotBox{.5 * r2d2::Length::METER,
                                .5 * r2d2::Length::METER,
                                0 * r2d2::Length::METER};
-    r2d2::AStarPathFinder pf(map, robotBox);
+    LockingSharedObject<r2d2::Map> sharedMap{map};
+    r2d2::AStarPathFinder pf(sharedMap, {{}, robotBox});
 
     r2d2::Coordinate start{-1 * r2d2::Length::METER, -1 * r2d2::Length::METER, 0 * r2d2::Length::METER};
     r2d2::Coordinate goal{49.5 * r2d2::Length::METER, 49.5 * r2d2::Length::METER,
@@ -145,7 +149,8 @@ TEST(PathFinder, not_existing_end) {
     r2d2::Translation robotBox{.5 * r2d2::Length::METER,
                                .5 * r2d2::Length::METER,
                                0 * r2d2::Length::METER};
-    r2d2::AStarPathFinder pf(map, robotBox);
+    LockingSharedObject<r2d2::Map> sharedMap{map};
+    r2d2::AStarPathFinder pf(sharedMap, {{}, robotBox});
 
     r2d2::Coordinate start{.5 * r2d2::Length::METER,
                            .5 * r2d2::Length::METER,
@@ -164,7 +169,8 @@ TEST(PathFinder, without_obstacles) {
     r2d2::Translation robotBox{.5 * r2d2::Length::METER,
                                .5 * r2d2::Length::METER,
                                0 * r2d2::Length::METER};
-    r2d2::AStarPathFinder pf(map, robotBox);
+    LockingSharedObject<r2d2::Map> sharedMap{map};
+    r2d2::AStarPathFinder pf(sharedMap, {{}, robotBox});
 
     r2d2::Coordinate start{.5 * r2d2::Length::METER, .5 * r2d2::Length::METER, 0 * r2d2::Length::METER};
     r2d2::Coordinate goal{49.5 * r2d2::Length::METER, 49.5 * r2d2::Length::METER,
@@ -205,7 +211,8 @@ TEST(PathFinder, consistent) {
     ASSERT_TRUE(std::get<0>(result)) << start << " " << goal << " first time";
     ASSERT_FALSE(path.empty()) << "path empty";
     std::vector<r2d2::Coordinate> currentpath = path;
-    r2d2::AStarPathFinder p2{std::get<1>(result), robotBox};
+    LockingSharedObject<r2d2::Map> sharedMap{std::get<1>(result)};
+    r2d2::AStarPathFinder p2{sharedMap, {{}, robotBox}};
     ASSERT_TRUE(p2.get_path_to_coordinate(start, goal, path))
                                 << start << " " << goal << " second time";
     ASSERT_TRUE(equal(currentpath, path));
@@ -216,7 +223,8 @@ TEST(PathFinder, robot_size) {
     // size 0
     r2d2::Translation robotBox{0 * r2d2::Length::METER, 0 * r2d2::Length::METER,
                          0 * r2d2::Length::METER};
-    r2d2::AStarPathFinder pf(map, robotBox);
+    LockingSharedObject<r2d2::Map> sharedMap{map};
+    r2d2::AStarPathFinder pf(sharedMap, {{}, robotBox});
 
     r2d2::Coordinate start{10.5 * r2d2::Length::METER,
                            10.5 * r2d2::Length::METER,
@@ -233,7 +241,8 @@ TEST(PathFinder, robot_size) {
     r2d2::Translation robotBox2{5 * r2d2::Length::METER,
                                 5 * r2d2::Length::METER,
                                 0 * r2d2::Length::METER};
-    r2d2::AStarPathFinder pf1(map, robotBox2);
+    LockingSharedObject<r2d2::Map> sharedMap2{map};
+    r2d2::AStarPathFinder pf1(sharedMap2, {{}, robotBox2});
     ASSERT_TRUE(pf1.get_path_to_coordinate(start, goal, path))
                                 << start << " " << goal << " robot with size 5";
     ASSERT_FALSE(path.empty());
@@ -246,7 +255,8 @@ TEST(PathFinder, obstacle_on_begin) {
     r2d2::Translation robotBox{.5 * r2d2::Length::METER,
                                .5 * r2d2::Length::METER,
                                0 * r2d2::Length::METER};
-    r2d2::AStarPathFinder pf(map, robotBox);
+    LockingSharedObject<r2d2::Map> sharedMap{map};
+    r2d2::AStarPathFinder pf(sharedMap, {{}, robotBox});
 
     r2d2::Coordinate start{.5 * r2d2::Length::METER,
                            .5 * r2d2::Length::METER,
@@ -267,7 +277,8 @@ TEST(PathFinder, obstacle_on_end) {
     r2d2::Translation robotBox{.5 * r2d2::Length::METER,
                                .5 * r2d2::Length::METER,
                                0 * r2d2::Length::METER};
-    r2d2::AStarPathFinder pf(map, robotBox);
+    LockingSharedObject<r2d2::Map> sharedMap{map};
+    r2d2::AStarPathFinder pf(sharedMap, {{}, robotBox});
 
     r2d2::Coordinate start{.5 * r2d2::Length::METER,
                            .5 * r2d2::Length::METER,
@@ -286,7 +297,8 @@ TEST(PathFinder, float) {
     r2d2::Translation robotBox{.5 * r2d2::Length::METER,
                                .5 * r2d2::Length::METER,
                                0 * r2d2::Length::METER};
-    r2d2::AStarPathFinder pf(map, robotBox);
+    LockingSharedObject<r2d2::Map> sharedMap{map};
+    r2d2::AStarPathFinder pf(sharedMap, {{}, robotBox});
     r2d2::Coordinate start{.56 * r2d2::Length::METER,
                            .52 * r2d2::Length::METER,
                            0 * r2d2::Length::METER};
@@ -304,7 +316,8 @@ TEST(PathFinder, same_begin_as_end) {
     r2d2::Translation robotBox{.5 * r2d2::Length::METER,
                                .5 * r2d2::Length::METER,
                                0 * r2d2::Length::METER};
-    r2d2::AStarPathFinder pf(map, robotBox);
+    LockingSharedObject<r2d2::Map> sharedMap{map};
+    r2d2::AStarPathFinder pf(sharedMap, {{}, robotBox});
 
     r2d2::Coordinate start{1 * r2d2::Length::METER,
                            1 * r2d2::Length::METER,
@@ -335,7 +348,8 @@ TEST(PathFinder, corner_squeezing) {
     r2d2::Translation robotBox{.5 * r2d2::Length::METER,
                                .5 * r2d2::Length::METER,
                                0 * r2d2::Length::METER};
-    r2d2::AStarPathFinder pf(map, robotBox);
+    LockingSharedObject<r2d2::Map> sharedMap{map};
+    r2d2::AStarPathFinder pf(sharedMap, {{}, robotBox});
 
     r2d2::Coordinate start{.5 * r2d2::Length::METER,
                            .5 * r2d2::Length::METER,
@@ -406,10 +420,12 @@ TEST(PathFinder, image_test) {
     while (!done) {
 
         r2d2::Map map = {mapX, mapY, 0.4f};
-        r2d2::AStarPathFinder pathFinder = {map,
-                                       {0.5 * r2d2::Length::METER,
-                                        0.5 * r2d2::Length::METER,
-                                        0 * r2d2::Length::METER}};
+        LockingSharedObject<r2d2::Map> sharedMap{map};
+        r2d2::AStarPathFinder pathFinder = {sharedMap,
+                                            {{},
+                                             r2d2::Translation{0.5 * r2d2::Length::METER,
+                                              0.5 * r2d2::Length::METER,
+                                              0 * r2d2::Length::METER}}};
         std::vector<r2d2::Coordinate> path;
         done = pathFinder.get_path_to_coordinate(
                 {5.5f * r2d2::Length::METER,
