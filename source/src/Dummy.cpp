@@ -50,17 +50,18 @@
 
 namespace r2d2 {
 
-    std::mt19937_64 Map::mersenne = std::mt19937_64{
+    std::mt19937_64 Dummy::mersenne = std::mt19937_64{
             (unsigned long) (time(0))};
 
-    Map::Map(int x, int y, float obstacles) :
-            map{} {
-        map.reserve((unsigned long) (x));
-        sizeX = x, sizeY = y;
-        for (int i1 = 0; i1 < x; i1++) {
+    Dummy::Dummy(int x, int y, float obstacles) :
+            map{},
+            sizeX{x},
+            sizeY{y} {
+        map.reserve((unsigned long) (y));
+        for (int i1 = 0; i1 < y; i1++) {
             map.emplace_back();
-            map[i1].reserve((unsigned long) (y));
-            for (int i2 = 0; i2 < y; i2++) {
+            map[i1].reserve((unsigned long) (x));
+            for (int i2 = 0; i2 < x; i2++) {
                 map[i1].emplace_back();
                 map[i1][i2] = std::uniform_real_distribution<float>{}(mersenne)
                               < obstacles ? 1 : 0;
@@ -69,51 +70,51 @@ namespace r2d2 {
     }
 
 
-    Map::Map(std::vector<std::vector<int>> map) :
+    Dummy::Dummy(std::vector<std::vector<int>> map) :
             map{map},
-            sizeX{int(map.size())},
-            sizeY{int(map[0].size())} {
+            sizeX{int(map[0].size())},
+            sizeY{int(map.size())} {
     }
 
-    void Map::print_map() {
-        for (int i1 = 0; i1 < sizeX; i1++) {
-            for (int i2 = 0; i2 < sizeY; i2++) {
+    void Dummy::print_map() {
+        for (int i1 = 0; i1 < sizeY; i1++) {
+            for (int i2 = 0; i2 < sizeX; i2++) {
                 std::cout << map[i1][i2];
             }
             std::cout << std::endl;
         }
     }
 
-    bool Map::has_obstacle(Coordinate coord, Translation size) {
-        for (int i1 = int(coord.get_x() / Length::METER);
-             i1 <= int((coord.get_x() + size.get_x()) / Length::METER); i1++) {
-            for (int i2 = int(coord.get_y() / Length::METER);
-                 i2 <=
-                 int((coord.get_y() + size.get_y()) / Length::METER); i2++) {
-                if (i1 < 0 || i1 >= sizeX ||
-                    i2 < 0 || i2 >= sizeY ||
-                    map[i1][i2] == 1 || map[i1][i2] == 2) {
-                    return true;
+    const BoxInfo Dummy::get_box_info(const Box box) {
+        bool obstacle = false, navigable = false, unknown = false;
+        for (int i1 = int(box.get_bottom_left().get_y() / Length::METER);
+             i1 <= int(box.get_top_right().get_y() / Length::METER); i1++) {
+            for (int i2 = int(box.get_bottom_left().get_x() / Length::METER);
+                 i2 <= int(box.get_top_right().get_x() / Length::METER); i2++) {
+                if (i1 < 0 || i1 >= sizeY ||
+                    i2 < 0 || i2 >= sizeX) {
+                    unknown = true;
+                } else {
+                    switch (map[i1][i2]) {
+                        case 0:
+                            navigable = true;
+                            break;
+                        case 1:
+                            obstacle = true;
+                            break;
+                        case 2:
+                            unknown = true;
+                            break;
+                        default:;
+                    }
                 }
             }
         }
-        return false;
+        return {obstacle, navigable, unknown};
     }
 
-    bool Map::has_passable(Coordinate coord, Translation size) {
-        for (int i1 = int(coord.get_x() / Length::METER);
-             i1 <= int((coord.get_x() + size.get_x()) / Length::METER); i1++) {
-            for (int i2 = int(coord.get_y() / Length::METER);
-                 i2 <=
-                 int((coord.get_y() + size.get_y()) / Length::METER); i2++) {
-                if (i1 < 0 && i1 >= sizeX &&
-                    i2 < 0 && i2 >= sizeY &&
-                    map[i1][i2] == 0) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    const Box Dummy::get_map_bounding_box() {
+        return {};
     }
 
 }

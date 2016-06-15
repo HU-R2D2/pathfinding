@@ -58,7 +58,7 @@
 // defines the amount of nodes that will be visited per length of the robot
 // for instance, if the robot has a size of 1m, and this value is 2, a node will
 // be opened every .5m
-#define SQUARES_PER_ROBOT 2
+#define SQUARES_PER_ROBOT 1
 
 namespace r2d2 {
 
@@ -69,7 +69,7 @@ namespace r2d2 {
      */
     class AStarPathFinder : public PathFinder {
     public:
-        AStarPathFinder(SharedObject<Map> &map, Box robotBox);
+        AStarPathFinder(SharedObject<ReadOnlyMap> &map, Box robotBox);
 
         virtual bool get_path_to_coordinate(
                 Coordinate start,
@@ -94,20 +94,21 @@ namespace r2d2 {
             virtual std::vector<CoordNode> get_available_nodes(
                     std::shared_ptr<CoordNode> &self) override;
 
-            AStarPathFinder &pathFinder;
-            Coordinate coord, &startNodeCoord;
+            std::reference_wrapper<AStarPathFinder> pathFinder;
+            Coordinate coord;
+            std::reference_wrapper<Coordinate> startNodeCoord;
 
             friend std::ostream &operator<<(std::ostream &lhs,
                                             const CoordNode &rhs) {
-                return lhs << "(" << rhs.coord << ", " << rhs.g
-                       << ", " << rhs.h << ", " << rhs.f << ")";
+                return lhs << "(" << rhs.coord << ",	" << rhs.g
+                       << ",	" << rhs.h << ",	" << rhs.f << ")";
             }
 
         };
         friend struct std::hash<CoordNode>;
 
-        SharedObject<Map> &map;
-        std::unique_ptr<SharedObject<Map>::Accessor> mapAccessor;
+        SharedObject<ReadOnlyMap> &map;
+        std::weak_ptr<SharedObject<ReadOnlyMap>::Accessor> mapAccessor;
         std::atomic<int> referenceCount;
         Translation robotBox;
 

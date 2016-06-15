@@ -52,7 +52,7 @@
 
 namespace r2d2 {
 
-    AStarPathFinder::AStarPathFinder(SharedObject<Map> &map, Box robotBox) :
+    AStarPathFinder::AStarPathFinder(SharedObject<ReadOnlyMap> &map, Box robotBox) :
             PathFinder{map, robotBox},
             map(map),
             mapAccessor{},
@@ -70,10 +70,11 @@ namespace r2d2 {
             return true;
         }
 
-        if (mapAccessor == nullptr) {
-            mapAccessor = std::unique_ptr<SharedObject<Map>::Accessor>{new SharedObject<Map>::Accessor{map}};
+        std::shared_ptr<SharedObject<ReadOnlyMap>::Accessor> ptr{mapAccessor.lock()};
+        if (ptr == nullptr) {
+            ptr = std::make_shared<SharedObject<ReadOnlyMap>::Accessor>(map);
+            mapAccessor = ptr; // doesn't have to be atomic as it doesn't matter what pointer is stored
         }
-        referenceCount++;
 
         // do a check for end node accessibility before starting the search
         if (!can_travel(goal, goal)) {
@@ -97,9 +98,6 @@ namespace r2d2 {
             smooth_path(path, start);
         }
 
-        if (--referenceCount == 0) {
-            mapAccessor.release();
-        }
         return foundStart != nullptr;
     }
 
@@ -124,17 +122,17 @@ namespace r2d2 {
                     // the grid will be relative to the end position of the search
                     Coordinate childPos{
                             coord + (Translation{
-                                    x * pathFinder.robotBox.get_x(),
-                                    y * pathFinder.robotBox.get_y(),
+                                    x * pathFinder.get().robotBox.get_x(),
+                                    y * pathFinder.get().robotBox.get_y(),
                                     0 * Length::METER
                             } / SQUARES_PER_ROBOT)};
                     //check whether the successor is the end node
-                    if (pathFinder.overlaps(childPos, startNodeCoord)) {
-                        childPos = {startNodeCoord};
+                    if (pathFinder.get().overlaps(childPos, startNodeCoord)) {
+                        childPos = {startNodeCoord.get()};
                     }
                     // can_travel is used so that it can be ensured that there is no
                     // obstacle in the path
-                    if (pathFinder.can_travel(coord, childPos)) {
+                    if (pathFinder.get().can_travel(coord, childPos)) {
                         children.push_back(
                                 CoordNode{pathFinder, childPos, startNodeCoord,
                                           g + AStarPathFinder::get_heuristic(
@@ -163,7 +161,8 @@ namespace r2d2 {
                 (from.get_x() > to.get_x() ? from.get_x() : to.get_x()),
                 (from.get_y() > to.get_y() ? from.get_y() : to.get_y()),
                 0 * Length::METER} - minCoord) + robotBox};
-        return !mapAccessor->access().has_obstacle(minCoord - (robotBox / 2), size);
+        BoxInfo info{mapAccessor.lock()->access().get_box_info(Box{minCoord - (robotBox / 2), size})};
+        return !(info.get_has_obstacle() || info.get_has_unknown());
     }
 
     bool AStarPathFinder::overlaps(const Coordinate &c1,

@@ -53,6 +53,7 @@
 #include <random>
 #include <vector>
 #include <ctime>
+#include "../../../map/source/include/MapInterface.hpp"
 #include "../../../adt/source/include/Coordinate.hpp"
 #include "../../../adt/source/include/Translation.hpp"
 
@@ -61,7 +62,7 @@ namespace r2d2 {
     /*!
     * Map for testing the pathfinder
     */
-    class Map {
+    class Dummy : public ReadOnlyMap {
     public:
         //! Implementation of the map, where: 0 = clear, 1 = obstacle, 2 = unexplored
         std::vector<std::vector<int>> map;
@@ -75,13 +76,13 @@ namespace r2d2 {
         * \param y The height of the map
         * \param obstacles Percentage of obstacles in the map
         */
-        Map(int x = 100, int y = 100, float obstacles = 0.25f);
+        Dummy(int x = 100, int y = 100, float obstacles = 0.25f);
 
         //! Constructor
         /*!
         * \param map The map
         */
-        Map(std::vector<std::vector<int> > map);
+        Dummy(std::vector<std::vector<int> > map);
 
         //! Print the map
         /*!
@@ -89,28 +90,13 @@ namespace r2d2 {
         */
         void print_map();
 
-        //! Returns if position on the map has a obstacle within the robot size
-        /*!
-        * \param x The x position on the map
-        * \param y The y position on the map
-        * \param sizeX The width of the robot
-        * \param sizeY The height of the robot
-        * \return If there is a obstacle found
-        */
-        bool has_obstacle(Coordinate coord, Translation size);
+        virtual const BoxInfo get_box_info(const Box box) override;
 
-        //! Returns if position on the map has a passable erea within the robot size
-        /*!
-        * \param x The x position on the map
-        * \param y The y position on the map
-        * \param sizeX The width of the robot
-        * \param sizeY The height of the robot
-        * \return If there is a passable erea
-        */
-        bool has_passable(Coordinate coord, Translation size);
+        virtual const Box get_map_bounding_box() override;
 
     private:
         static std::mt19937_64 mersenne;
+
     };
 
 }
