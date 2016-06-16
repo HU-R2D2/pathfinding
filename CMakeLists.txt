@@ -9,7 +9,6 @@ file(GLOB SOURCES_GTEST
 		../adt/source/src/Coordinate.cpp
 		../adt/source/src/Translation.cpp
 		../adt/source/src/Box.cpp
-		../adt/source/src/Box.hpp
 		../map/source/src/MapInterface.cpp
 		source/src/Dummy.cpp
 		source/src/AStarPathFinder.cpp
@@ -19,6 +18,7 @@ file(GLOB SOURCES_GTEST
 		../sharedobjects/source/include/NotCopyable.hpp)
 
 include_directories(
+		../adt/source/include
 		../deps/gtest-1.7.0/include
 		../deps/gtest-1.7.0)
 
