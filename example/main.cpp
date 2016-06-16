@@ -35,14 +35,14 @@ for (int x = 0; x < 50; x++) {
       cornerSqueezeMap.push_back(current);
 }
 //initializing a map
-r2d2::Map map(cornerSqueezeMap);
+r2d2::Dummy map(cornerSqueezeMap);
 map.print_map();
 
 // initializing pathfinding
 r2d2::Translation robotBox{ .5 * r2d2::Length::METER,
                             .5 * r2d2::Length::METER,
                             0 * r2d2::Length::METER};
-LockingSharedObject<r2d2::Map> sharedMap{map};
+LockingSharedObject<r2d2::ReadOnlyMap> sharedMap{map};
 r2d2::AStarPathFinder path_finder(sharedMap, {{}, robotBox});
 
 //Computing a path between coordinates

@@ -2,23 +2,34 @@ cmake_minimum_required(VERSION 2.8.9)
 project(R2D2_pathfinding)
 find_package (Threads)
 
-file(GLOB SOURCES "source/include/*.hpp" "source/src/*.cpp" "example/*.cpp" "../adt/source/include/*.hpp" "../adt/source/src/*.cpp" "../sharedobjects/source/include/*.hpp" "../sharedobjects/source/src/*.cpp" )
-file(GLOB SOURCES_GTEST "source/src/*.cpp" "source/include/*.hpp" 
-		"test/*.cpp" "test/*.hpp" 
-		"../adt/source/src/Coordinate.cpp" "../adt/source/include/Coordinate.hpp"
-		"../adt/source/src/Length.cpp" "../adt/source/include/Length.hpp"
-		"../adt/source/src/Translation.cpp" "../adt/source/include/Translation.hpp"
-		"../adt/source/src/Box.cpp" "../adt/source/include/Box.hpp"
-		"../sharedobjects/source/include/SharedObject.hpp"
-		"../sharedobjects/source/include/LockingSharedObject.hpp"
-		"../sharedobjects/source/include/NotCopyable.hpp"
-		)
-list(REMOVE_ITEM SOURCES_GTEST ${CMAKE_CURRENT_SOURCE_DIR}../adt/source/src/main.cpp)
+file(GLOB SOURCES
+		source/include/*.hpp
+		source/src/*.cpp
+		example/*.cpp
+		../map/source/src/MapInterface.cpp
+		../adt/source/include/*.hpp
+		../adt/source/src/*.cpp
+		../sharedobjects/source/include/*.hpp
+		../sharedobjects/source/src/*.cpp)
+
+file(GLOB SOURCES_GTEST
+		../adt/source/src/Length.cpp
+		../adt/source/src/Coordinate.cpp
+		../adt/source/src/Translation.cpp
+		../adt/source/src/Box.cpp
+		../map/source/src/MapInterface.cpp
+		source/src/Dummy.cpp
+		source/src/AStarPathFinder.cpp
+		test/PathFinder_Test.cpp
+		../sharedobjects/source/include/SharedObject.hpp
+		../sharedobjects/source/include/LockingSharedObject.hpp
+		../sharedobjects/source/include/NotCopyable.hpp)
 
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -Wall")
 
 include_directories(
+		../map/source/include
 		../adt/source/include
 		../sharedobjects/source/include
 		../deps/gtest-1.7.0/include
