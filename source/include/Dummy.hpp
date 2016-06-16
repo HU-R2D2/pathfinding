@@ -53,9 +53,9 @@
 #include <random>
 #include <vector>
 #include <ctime>
-#include <MapInterface.hpp>
-#include <Coordinate.hpp>
-#include <Translation.hpp>
+#include "../../../map/source/include/MapInterface.hpp"
+#include "../../../adt/source/include/Coordinate.hpp"
+#include "../../../adt/source/include/Translation.hpp"
 
 namespace r2d2 {
     //! Dummy Map
