@@ -77,9 +77,9 @@ namespace r2d2 {
                 parent{parent} {
         }
 
-        const Length g;
+        Length g;
         Length h, f;
-        const std::weak_ptr<T> parent;
+        std::weak_ptr<T> parent;
 
         /**
          * checks if two nodes can be considered equal for the algorithm
@@ -142,7 +142,7 @@ namespace r2d2 {
             while (!open.empty() && --giveUpCount >= 0) {
                 std::shared_ptr<T> curOpen{open[0]};
                 // use the heap methods from std,
-                // as this is a very performat use case
+                // as this is a fitting use case
                 std::pop_heap(open.begin(), open.end(),
                               [](std::shared_ptr<T> &n1,
                                  std::shared_ptr<T> &n2) {
@@ -156,11 +156,15 @@ namespace r2d2 {
                     std::shared_ptr<T> child{std::make_shared<T>(c)};
 
                     // add the child to the closed set
-                    auto result = closed.emplace(child);
-                    if (result.second) {
+                    auto result = closed.insert(child);
+                    if (result.second || ((**result.first) > (*child))) {
+                        if (!result.second) {
+                            **result.first = *child;
+                            // change the coordnode to be the better node
+                        }
                         // if the node did not yet exist in the set
                         // push the heap with the new open node
-                        open.emplace_back(*result.first);
+                        open.push_back(*result.first);
                         std::push_heap(
                                 open.begin(), open.end(),
                                 [](std::shared_ptr<T> &n1,

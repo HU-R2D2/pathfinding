@@ -48,11 +48,10 @@
 
 #ifndef R2D2_PATHFINDING_PATHFINDER_HPP
 #define R2D2_PATHFINDING_PATHFINDER_HPP
+
 #include <vector>
-#include <memory>
 #include "../../../adt/source/include/Box.hpp"
 #include "../../../sharedobjects/source/include/SharedObject.hpp"
-// TODO replace this with the actual interface
 #include "Dummy.hpp"
 
 namespace r2d2 {
@@ -70,7 +69,7 @@ namespace r2d2 {
 		 * \param map Reference to the world map
 		 * \param robotSize Reference to the robot size
 		 */
-		PathFinder(SharedObject<Map> &map, Box robotBox) {};
+		PathFinder(SharedObject<ReadOnlyMap> &map, Box robotBox) {};
 
 		/**
 		 * Returns a path between two points
